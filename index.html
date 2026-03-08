@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonal Jayawardana | Executive – IT</title>
+    <meta name="description"
+        content="Portfolio of Sonal Shashika Darshana Jayawardana, Executive – IT at AAT Sri Lanka. Specialist in IT infrastructure, automation, and AI.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- GSAP Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
+</head>
+
+<body class="dark-theme">
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-binary"></div>
+            <div class="loader-text">INITIALIZING SYSTEM...</div>
+            <div class="loader-bar">
+                <div class="loader-progress"></div>
+            </div>
+        </div>
+    </div>
+    <div id="scroll-progress"></div>
+    <div id="noise-overlay"></div>
+    <canvas id="neural-canvas"></canvas>
+    <div class="nav-container">
+        <a href="#" class="logo">Sonal<span>.</span></a>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">Profile</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#terminal">Terminal</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="theme-toggle" id="theme-toggle">
+            <div class="toggle-icon"></div>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-bg">
+                <div class="particles"></div>
+                <div class="glow"></div>
+            </div>
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <span class="badge">Executive – IT</span>
+                    <h1>Sonal Shashika Darshana <span>Jayawardana</span></h1>
+                    <p class="tagline">IT professional specializing in automation, infrastructure management, and
+                        technology innovation.</p>
+                    <div class="hero-actions">
+                        <a href="#projects" class="btn btn-primary">View Projects</a>
+                        <a href="#contact" class="btn btn-secondary">Contact Me</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="image-wrapper">
+                        <img src="images/profile.png" alt="Sonal Jayawardana" class="profile-img floating">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section (System Profile) -->
+        <section id="about" class="section">
+            <div class="container">
+                <h2 class="section-title">01. <span class="gradient-text">System Profile</span></h2>
+                <div class="about-grid">
+                    <div class="about-text">
+                        <p>I am a dynamic IT professional with a proven ability to work on my own
+                            initiative and as part of a high-performing team. With a strong positive
+                            attitude and excellent analytical problem-solving skills, I specialize
+                            in bridging the gap between complex infrastructure and user-centric
+                            solutions.</p>
+                        <p>Currently serving as an <strong>IT Executive at AAT Sri Lanka</strong>, I
+                            oversee critical technology operations, hardware engineering, and
+                            infrastructure management. My background is rooted in hands-on technical
+                            troubleshooting and system administration, complemented by a deep
+                            interest in graphic design and project management.</p>
+                        <p>My career objective is to continuously drive technology innovation while
+                            delivering robust, scalable hardware and software systems.</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card project-card">
+                            <h3>9+</h3>
+                            <p>Years Tech Experience</p>
+                        </div>
+                        <div class="stat-card project-card">
+                            <h3>100%</h3>
+                            <p>System Reliability</p>
+                        </div>
+                        <div class="stat-card project-card">
+                            <h3>3+</h3>
+                            <p>Certifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="experience-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">Career Path</span>
+                    <h2>Professional <span class="gradient-text">Experience</span></h2>
+                </div>
+                <div class="bento-grid">
+                    <div class="project-card bento-large">
+                        <div class="project-content">
+                            <div class="timeline-date"
+                                style="color: var(--accent-color); font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                Mar 2023 - Present</div>
+                            <h3>Information Technology Executive</h3>
+                            <h4 style="color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500;">
+                                Association of Accounting Technicians of Sri Lanka (AAT)</h4>
+                            <p style="margin-bottom: 0;">Managing and optimizing IT infrastructure, providing technical
+                                leadership, and ensuring
+                                the reliability of critical systems across the organization.</p>
+                        </div>
+                    </div>
+                    <div class="project-card bento-large">
+                        <div class="project-content">
+                            <div class="timeline-date"
+                                style="color: var(--accent-color); font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                May 2014 - Apr 2023</div>
+                            <h3>Computer Hardware Technician</h3>
+                            <h4 style="color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500;">
+                                Association of Accounting Technicians of Sri Lanka (AAT)</h4>
+                            <p style="margin-bottom: 0;">Handled hardware diagnostics, repair, assembly, and network
+                                troubleshooting. Maintained
+                                workstation health and provided immediate technical support for 9 years.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <div class="container">
+                <h2 class="section-title">02. <span class="gradient-text">Core Capabilities</span>
+                </h2>
+                <div class="bento-grid">
+                    <div class="skill-category project-card bento-large">
+                        <div class="project-content">
+                            <h3>Infrastructure & Virtualization</h3>
+                            <ul class="skill-list" style="columns: 2;">
+                                <li>VMWare ESXi & Hyper-V</li>
+                                <li>Active Directory & System Admin</li>
+                                <li>Hardware Engineering & Repair</li>
+                                <li>CCTV & PABX Systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="skill-category project-card bento-third">
+                        <div class="project-content">
+                            <h3>Networking & Security</h3>
+                            <ul class="skill-list">
+                                <li>FortiGate Firewalls</li>
+                                <li>Network Administration</li>
+                                <li>Wireless Networking</li>
+                                <li>Network Security & Troubleshooting</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="skill-category project-card bento-third">
+                        <div class="project-content">
+                            <h3>Software & Database</h3>
+                            <ul class="skill-list">
+                                <li>C# Development</li>
+                                <li>Microsoft SQL Server</li>
+                                <li>IT Technical Support</li>
+                                <li>Video Editing & Design</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="skill-category project-card bento-third">
+                        <div class="project-content">
+                            <h3>Management</h3>
+                            <ul class="skill-list">
+                                <li>Project Management</li>
+                                <li>Technology Leadership</li>
+                                <li>Recruitment & HR</li>
+                                <li>Team Collaboration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section (Bento Grid) -->
+        <section id="projects" class="projects-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">Featured Work</span>
+                    <h2>Portfolio <span class="gradient-text">Showcase</span></h2>
+                </div>
+
+                <div class="bento-grid">
+                    <!-- Featured Project -->
+                    <div class="project-card bento-large">
+                        <div class="project-content">
+                            <h3>Enterprise Network Monitor</h3>
+                            <p>A custom C# dashboard integrating with FortiGate APIs for real-time traffic analysis and
+                                threat detection across 5 regional branches.</p>
+                            <div class="tech-stack">
+                                <span>C#</span><span>Fortinet API</span><span>SQL Server</span>
+                            </div>
+                            <div class="project-links">
+                                <a href="#" class="btn btn-primary" onclick="return false;">View Architecture</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Project 1 -->
+                    <div class="project-card bento-small">
+                        <div class="project-content">
+                            <h3>Automated Backup System</h3>
+                            <p>PowerShell scripting framework that eliminated 95% of manual server backup tasks and
+                                guaranteed 100% daily verification.</p>
+                            <div class="tech-stack">
+                                <span>PowerShell</span><span>Windows Server</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Project 2 -->
+                    <div class="project-card bento-small">
+                        <div class="project-content">
+                            <h3>AAT Corporate Portal Overhaul</h3>
+                            <p>Led the technical deployment of the new internal staff portal, improving cross-department
+                                data sharing speed by 40%.</p>
+                            <div class="tech-stack">
+                                <span>Project Management</span><span>UI/UX</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terminal Section -->
+        <section id="terminal" class="terminal-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">Interactive</span>
+                    <h2>System <span class="gradient-text">Console</span></h2>
+                </div>
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="terminal-title">sonal@jayawardana: ~</div>
+                    </div>
+                    <div class="terminal-body" id="terminal-body">
+                        <div id="terminal-output">
+                            <div class="terminal-line">Welcome to Sonal's IT Console. Type 'help' to see available
+                                commands.</div>
+                        </div>
+                        <div class="terminal-input-line">
+                            <span class="prompt">sonal@jayawardana:~$</span>
+                            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false"
+                                data-lenis-prevent>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <span class="subtitle">Get In Touch</span>
+                        <h3>Let's build something <span>together</span></h3>
+                        <p>Available for consulting, technical projects, or professional networking.</p>
+                        <div class="contact-details">
+                            <a href="mailto:sonalshashika@gmail.com" class="contact-card">
+                                <div class="info-text"><span>Email Me</span>
+                                    <p>sonalshashika@gmail.com</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <form id="contact-form">
+                            <div class="form-group"><label>Full Name</label><input type="text" placeholder="John Doe"
+                                    required></div>
+                            <div class="form-group"><label>Email Address</label><input type="email"
+                                    placeholder="john@example.com" required></div>
+                            <div class="form-group"><label>Message</label><textarea rows="5"
+                                    placeholder="Your message here..." required></textarea></div>
+                            <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2026 Sonal Jayawardana. All rights reserved.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/sonal-shashika-darshana-jayawardana-236828104/"
+                    target="_blank">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <svg style="display:none;">
+        <defs>
+            <filter id="glitch-filter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.1 0.1" numOctaves="1" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
