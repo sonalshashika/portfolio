@@ -1,0 +1,11 @@
+.gemini/
+.agent/
+.agents/
+.DS_Store
+node_modules/
+dist/
+build/
+*.log
+tmp/
+Caret/
+brain/
