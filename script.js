@@ -4,11 +4,26 @@ const init = () => {
 
     // --- Lenis Smooth Scroll ---
     const lenis = new Lenis({ smoothWheel: true });
+
+    // Update ScrollTrigger on Lenis scroll
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // Sync Lenis with GSAP ticker
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
     function raf(time) {
         lenis.raf(time);
         requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
+
+    // Refresh ScrollTrigger after all assets load
+    window.addEventListener('load', () => {
+        ScrollTrigger.refresh();
+    });
 
     // Pause Lenis when terminal input is focused so keyboard events reach it
     document.addEventListener('focusin', (e) => {
@@ -346,12 +361,18 @@ const init = () => {
         const originalText = element.textContent;
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
         let iterations = 0;
+
+        element.classList.add('decrypting');
+
         const interval = setInterval(() => {
             element.textContent = originalText.split("").map((char, index) => {
                 if (index < iterations) return originalText[index];
                 return chars[Math.floor(Math.random() * chars.length)];
             }).join("");
-            if (iterations >= originalText.length) clearInterval(interval);
+            if (iterations >= originalText.length) {
+                clearInterval(interval);
+                element.classList.remove('decrypting');
+            }
             iterations += 1 / 3;
         }, 30);
     }
