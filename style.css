@@ -724,9 +724,32 @@ ul {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 1.5rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+.stat-card p {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    margin: 0;
 }
 
 .about-text p {
@@ -1154,8 +1177,10 @@ ul {
 
 .decrypting {
     color: var(--matrix-green);
-    font-family: 'Courier New', monospace;
+    font-family: 'Space Mono', monospace !important;
     text-shadow: 0 0 10px var(--matrix-green);
+    letter-spacing: 0.05em;
+    display: inline-block;
 }
 
 /* Kinetic Scrolling */
