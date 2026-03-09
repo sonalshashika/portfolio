@@ -60,6 +60,11 @@ const init = () => {
     const navLinks = document.querySelector('.nav-links');
 
     if (mobileMenu && navLinks) {
+        // Assign index for staggered animation
+        navLinks.querySelectorAll('a').forEach((link, idx) => {
+            link.style.setProperty('--i', idx + 1);
+        });
+
         mobileMenu.addEventListener('click', () => {
             navLinks.classList.toggle('active');
         });
@@ -71,6 +76,33 @@ const init = () => {
             });
         });
     }
+
+    // --- Mobile Tap Interactions (Data Pulse) ---
+    const addDataPulse = (e, element) => {
+        const pulse = document.createElement('div');
+        pulse.className = 'data-pulse';
+        const rect = element.getBoundingClientRect();
+
+        let x, y;
+        if (e.type === 'touchstart') {
+            x = e.touches[0].clientX - rect.left;
+            y = e.touches[0].clientY - rect.top;
+        } else {
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+        }
+
+        pulse.style.left = `${x}px`;
+        pulse.style.top = `${y}px`;
+        element.appendChild(pulse);
+        setTimeout(() => pulse.remove(), 600);
+    };
+
+    document.querySelectorAll('.project-card, .stat-card, .skill-category, .cert-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) addDataPulse(e, card);
+        });
+    });
 
     // --- Cinematic Preloader ---
     const preloader = document.getElementById('preloader');
@@ -140,6 +172,14 @@ const init = () => {
 
         window.addEventListener('click', (e) => {
             shockwaves.push({ x: e.clientX, y: e.clientY, radius: 0, maxRadius: 300, life: 1 });
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            shockwaves.push({ x: touch.clientX, y: touch.clientY, radius: 0, maxRadius: 200, life: 1 });
+            // Update mouse pos for particles to react on touch too
+            mouse.x = touch.clientX;
+            mouse.y = touch.clientY;
         });
 
         class Particle {
