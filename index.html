@@ -221,9 +221,16 @@
                     <h2>Portfolio <span class="gradient-text">Showcase</span></h2>
                 </div>
 
+                <div class="project-filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="infrastructure">Infrastructure</button>
+                    <button class="filter-btn" data-filter="development">Development</button>
+                    <button class="filter-btn" data-filter="automation">Automation</button>
+                </div>
+
                 <div class="bento-grid">
                     <!-- Featured Project -->
-                    <div class="project-card bento-large">
+                    <div class="project-card bento-large" data-category="infrastructure">
                         <div class="project-content">
                             <h3>Enterprise Network Monitor</h3>
                             <p>A custom C# dashboard integrating with FortiGate APIs for real-time traffic analysis and
@@ -238,7 +245,7 @@
                     </div>
 
                     <!-- Secondary Project 1 -->
-                    <div class="project-card bento-small">
+                    <div class="project-card bento-small" data-category="automation">
                         <div class="project-content">
                             <h3>Automated Backup System</h3>
                             <p>PowerShell scripting framework that eliminated 95% of manual server backup tasks and
@@ -250,7 +257,7 @@
                     </div>
 
                     <!-- Secondary Project 2 -->
-                    <div class="project-card bento-small">
+                    <div class="project-card bento-small" data-category="development">
                         <div class="project-content">
                             <h3>AAT Corporate Portal Overhaul</h3>
                             <p>Led the technical deployment of the new internal staff portal, improving cross-department

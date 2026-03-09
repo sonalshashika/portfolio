@@ -84,7 +84,12 @@ const init = () => {
     const tlPreloader = gsap.timeline({
         onComplete: () => {
             clearInterval(binaryInterval);
-            gsap.to(preloader, { opacity: 0, duration: 1, onComplete: () => preloader.style.display = 'none' });
+            gsap.to(preloader, {
+                opacity: 0, duration: 1, onComplete: () => {
+                    preloader.style.display = 'none';
+                    ScrollTrigger.refresh();
+                }
+            });
             initHeroAnimations();
         }
     });
@@ -286,23 +291,45 @@ const init = () => {
     });
 
     // --- Advanced Scroll Animations ---
-    // Staggered Reveal for Cards
-    const sections = document.querySelectorAll('section');
-    sections.forEach(sec => {
-        const cards = sec.querySelectorAll('.project-card, .stat-card, .skill-category, .timeline-item, .cert-card');
-        if (cards.length > 0) {
-            gsap.from(cards, {
-                scrollTrigger: {
-                    trigger: sec,
-                    start: "top 80%",
-                },
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.15,
-                ease: "back.out(1.7)"
+    // --- Project Filtering Logic ---
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card[data-category]');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.getAttribute('data-filter');
+
+            projectCards.forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                    gsap.to(card, { display: 'flex', opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" });
+                } else {
+                    gsap.to(card, { display: 'none', opacity: 0, scale: 0.95, duration: 0.4, ease: "power2.in" });
+                }
             });
-        }
+
+            // Refresh ScrollTrigger as layout changed
+            setTimeout(() => ScrollTrigger.refresh(), 500);
+        });
+    });
+
+    // --- Section Reveal Animations ---
+    const revealElements = document.querySelectorAll('.section-header, .section-title, .project-card, .timeline-item, .skill-category');
+    revealElements.forEach(el => {
+        gsap.from(el, {
+            scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                toggleActions: "play none none none"
+            },
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
     });
 
     // --- Magnetic Interactions ---
@@ -377,9 +404,8 @@ const init = () => {
         }, 30);
     }
 
-    gsap.utils.toArray('h2').forEach(heading => {
-        ScrollTrigger.create({ trigger: heading, start: "top 90%", onEnter: () => decryptText(heading), once: true });
-    });
+    // Headers are now handled by the reveal animation above
+    // No more distracting scramble on scroll for standard headers
 
     // --- Terminal Interactive ---
     const terminalInput = document.getElementById('terminal-input');

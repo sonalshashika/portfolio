@@ -877,12 +877,8 @@ ul {
 .filter-btn.active {
     background: var(--accent-color);
     color: white;
-    height: 100%;
-    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 255, 255, 0.06), transparent 40%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
 .project-card:hover::before {
