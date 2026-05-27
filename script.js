@@ -20,6 +20,23 @@ const init = () => {
     }
     requestAnimationFrame(raf);
 
+    // Intercept clicks on links that start with # for Lenis smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+                e.preventDefault();
+                lenis.scrollTo(targetEl, {
+                    offset: 0,
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) // fast-to-slow exponential ease
+                });
+            }
+        });
+    });
+
     // Refresh ScrollTrigger after all assets load
     window.addEventListener('load', () => {
         ScrollTrigger.refresh();
@@ -207,17 +224,33 @@ const init = () => {
                         this.y += (dy / dist) * force;
                     }
                 });
+
+                // Apply space gravity attraction
+                const preset = window.animationPreset || 'matrix';
+                if (preset === 'space' && mouse.x !== null && mouse.y !== null) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < 300) {
+                        const force = (1 - dist / 300) * 0.15;
+                        this.x += (dx / dist) * force * (this.layer + 1);
+                        this.y += (dy / dist) * force * (this.layer + 1);
+                    }
+                }
+
                 this.x += this.vx; this.y += this.vy;
                 if (this.x < 0) this.x = bkgCanvas.width;
                 if (this.x > bkgCanvas.width) this.x = 0;
                 if (this.y < 0) this.y = bkgCanvas.height;
                 if (this.y > bkgCanvas.height) this.y = 0;
             }
-            draw() {
+            draw(activeColor) {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(59, 130, 246, ${this.alpha})`;
+                ctx.fillStyle = activeColor;
+                ctx.globalAlpha = this.alpha;
                 ctx.fill();
+                ctx.globalAlpha = 1.0;
             }
         }
 
@@ -236,11 +269,50 @@ const init = () => {
                 if (this.y > bkgCanvas.height) this.init();
             }
             draw() {
-                ctx.font = "10px monospace";
-                ctx.fillStyle = "rgba(0, 255, 65, 0.15)";
-                for (let i = 0; i < this.length; i++) {
-                    const char = Math.random() > 0.9 ? "1" : "0";
-                    ctx.fillText(char, this.x, this.y - (i * 12));
+                const preset = window.animationPreset || 'matrix';
+                const activeColor = getComputedStyle(document.body).getPropertyValue('--accent-color').trim() || '#3b82f6';
+                
+                if (preset === 'neon') {
+                    // Soft glowing drift blobs matching active accent color
+                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, 30);
+                    grad.addColorStop(0, `${activeColor}20`); // ~0.12 opacity
+                    grad.addColorStop(1, `${activeColor}00`);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+                } else if (preset === 'terminal') {
+                    // Monospaced retro terminal commands
+                    ctx.font = "11px 'Space Mono', monospace";
+                    ctx.fillStyle = `${activeColor}22`; // ~0.13 opacity
+                    const commands = ["SYS_INIT", "CONN_SECURE", "KERN_OK", "CPU_LOAD_32%", "MEM_OK", "AUTH_GRNT", "PORT_8000", "NET_MONITOR", "BACKUP_OK"];
+                    const word = commands[Math.floor(this.x + this.y) % commands.length];
+                    ctx.fillText(word, this.x, this.y);
+                } else if (preset === 'hologram') {
+                    // Holographic glitch horizontal scan bands & digital strings
+                    if (Math.random() > 0.96) {
+                        ctx.fillStyle = `${activeColor}15`; // ~0.08 opacity
+                        ctx.fillRect(0, this.y, bkgCanvas.width, Math.random() * 6 + 1);
+                    }
+                    ctx.font = "9px 'Space Mono', monospace";
+                    ctx.fillStyle = `${activeColor}25`; // ~0.14 opacity
+                    const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase();
+                    ctx.fillText(`[${randomStr}]`, this.x, this.y);
+                } else if (preset === 'space') {
+                    // Small slow-drifting twinkling stars
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
+                    ctx.fillStyle = `${activeColor}33`; // ~0.20 opacity
+                    ctx.fill();
+                } else {
+                    // Default: matrix binary falling rain matching active theme matrix-green
+                    const matrixColor = getComputedStyle(document.body).getPropertyValue('--matrix-green').trim() || '#00ff41';
+                    ctx.font = "10px monospace";
+                    ctx.fillStyle = `${matrixColor}28`; // ~0.15 opacity
+                    for (let i = 0; i < this.length; i++) {
+                        const char = Math.random() > 0.9 ? "1" : "0";
+                        ctx.fillText(char, this.x, this.y - (i * 12));
+                    }
                 }
             }
         }
@@ -263,10 +335,11 @@ const init = () => {
 
         function animateCanvas() {
             ctx.clearRect(0, 0, bkgCanvas.width, bkgCanvas.height);
+            const activeColor = getComputedStyle(document.body).getPropertyValue('--accent-color').trim() || '#3b82f6';
             shockwaves = shockwaves.filter(sw => { sw.radius += 10; sw.life -= 0.02; return sw.life > 0; });
             streams.forEach(s => { s.update(); s.draw(); });
             particles.forEach((p, i) => {
-                p.update(); p.draw();
+                p.update(); p.draw(activeColor);
                 for (let j = i + 1; j < particles.length; j++) {
                     const p2 = particles[j];
                     if (Math.abs(p.layer - p2.layer) <= 1) {
@@ -275,8 +348,10 @@ const init = () => {
                         if (dist < maxDist) {
                             ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
                             const alpha = (0.2 * (1 - dist / maxDist)) * ((p.layer + 1) / layers);
-                            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+                            ctx.strokeStyle = activeColor;
+                            ctx.globalAlpha = alpha;
                             ctx.lineWidth = 0.5; ctx.stroke();
+                            ctx.globalAlpha = 1.0;
                         }
                     }
                 }
@@ -284,8 +359,10 @@ const init = () => {
                     const mDist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
                     if (mDist < 200) {
                         ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y);
-                        ctx.strokeStyle = `rgba(59, 130, 246, ${0.4 * (1 - mDist / 200)})`;
+                        ctx.strokeStyle = activeColor;
+                        ctx.globalAlpha = 0.4 * (1 - mDist / 200);
                         ctx.stroke();
+                        ctx.globalAlpha = 1.0;
                     }
                 }
             });
@@ -357,19 +434,34 @@ const init = () => {
     });
 
     // --- Section Reveal Animations ---
-    const revealElements = document.querySelectorAll('.section-header, .section-title, .project-card, .timeline-item, .skill-category');
+    const revealElements = document.querySelectorAll('.section-header, .section-title, .project-card, .timeline-item, .skill-category, .cert-card');
     revealElements.forEach(el => {
-        gsap.from(el, {
+        const preset = window.animationPreset || 'matrix';
+        let fromVars = {
             scrollTrigger: {
                 trigger: el,
                 start: "top 85%",
                 toggleActions: "play none none none"
             },
-            y: 30,
             opacity: 0,
             duration: 0.8,
             ease: "power2.out"
-        });
+        };
+
+        if (preset === 'neon') {
+            fromVars.scale = 0.95;
+            fromVars.y = 15;
+            fromVars.duration = 1.2;
+            fromVars.ease = "back.out(1.2)";
+        } else if (preset === 'terminal') {
+            fromVars.x = -25;
+            fromVars.duration = 0.6;
+            fromVars.ease = "power1.inOut";
+        } else {
+            fromVars.y = 30;
+        }
+
+        gsap.from(el, fromVars);
     });
 
     // --- Magnetic Interactions ---
@@ -426,9 +518,22 @@ const init = () => {
     function decryptText(element) {
         if (!element) return;
         const originalText = element.textContent;
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        const preset = window.animationPreset || 'matrix';
+        
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        if (preset === 'matrix') {
+            chars = "01ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"; // Japanese katakana + binary
+        } else if (preset === 'terminal') {
+            chars = "_/\\-[{}]#@*+<>="; // Monospaced terminal operators
+        } else if (preset === 'neon') {
+            chars = "ABCDEFabcdef0123456789"; // Hex values
+        } else if (preset === 'hologram') {
+            chars = "@#$%&+-*/_?^~|"; // Glitch glyphs
+        } else if (preset === 'space') {
+            chars = "✦✧★☆🌌🛸⚛️☄️☀️✨"; // Cosmic particles / symbols
+        }
+        
         let iterations = 0;
-
         element.classList.add('decrypting');
 
         const interval = setInterval(() => {
@@ -547,12 +652,18 @@ const init = () => {
                 ]);
 
             } else if (input === 'certs') {
-                printAsync(input, [
-                    '── CERTIFICATIONS ──────────────────────────────',
-                    '  [✓] Vocational Training Authority (VTA) – IT Support',
-                    '  [✓] A+ Academy – CompTIA A+ Equivalent',
-                    '  [✓] LITS – Advanced Networking & Administration',
-                ]);
+                if (globalCertsData && globalCertsData.length > 0) {
+                    const lines = ['── CERTIFICATIONS ──────────────────────────────'];
+                    globalCertsData.forEach(c => {
+                        lines.push(`  [✓] ${c.title} — ${c.issuer} (${c.date})`);
+                    });
+                    printAsync(input, lines);
+                } else {
+                    printAsync(input, [
+                        '── CERTIFICATIONS ──────────────────────────────',
+                        '  No credentials loaded in system database.',
+                    ]);
+                }
 
             } else if (input === 'contact') {
                 printAsync(input, [
@@ -684,7 +795,100 @@ const init = () => {
         card.addEventListener('mouseenter', () => card.classList.add('glitch-active'));
         card.addEventListener('mouseleave', () => card.classList.remove('glitch-active'));
     });
+
+    // --- 3D Interactive Playing Card (Ace of Spades) ---
+    const card = document.querySelector('.card-3d-container');
+    const cardInner = document.querySelector('.card-3d-inner');
+    const shine = document.querySelector('.holographic-shine');
+
+    if (card && cardInner) {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left; // x position within the element.
+            const y = e.clientY - rect.top;  // y position within the element.
+            
+            const w = rect.width;
+            const h = rect.height;
+            
+            // Normalize coordinate system: bounds [-0.5, 0.5]
+            const px = (x / w) - 0.5;
+            const py = (y / h) - 0.5;
+            
+            // Maximum tilt angle of 25 degrees
+            const tiltX = -py * 25;
+            const tiltY = px * 25;
+            
+            const isFlipped = card.classList.contains('flipped');
+            
+            // Invert the tilt values on the back face so they tilt correctly relative to the viewer
+            const currentRotateX = isFlipped ? -tiltX : tiltX;
+            const currentRotateY = isFlipped ? (180 - tiltY) : tiltY;
+            
+            gsap.to(cardInner, {
+                rotateX: currentRotateX,
+                rotateY: currentRotateY,
+                duration: 0.1,
+                ease: "power2.out",
+                overwrite: "auto"
+            });
+            
+            // Move holographic shine overlay
+            if (shine) {
+                const shineX = (x / w) * 100;
+                const shineY = (y / h) * 100;
+                
+                gsap.to(shine, {
+                    background: `radial-gradient(circle at ${shineX}% ${shineY}%, 
+                        rgba(255, 255, 255, 0.4) 0%, 
+                        rgba(244, 63, 94, 0.15) 25%, 
+                        rgba(59, 130, 246, 0.15) 50%, 
+                        transparent 75%)`,
+                    duration: 0.1,
+                    overwrite: "auto"
+                });
+            }
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            const isFlipped = card.classList.contains('flipped');
+            
+            gsap.to(cardInner, {
+                rotateX: 0,
+                rotateY: isFlipped ? 180 : 0,
+                duration: 0.8,
+                ease: "elastic.out(1, 0.6)",
+                overwrite: "auto"
+            });
+            
+            if (shine) {
+                gsap.to(shine, {
+                    background: `radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, transparent 60%)`,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            }
+        });
+        
+        card.addEventListener('click', (e) => {
+            // Prevent flipping if click was on actual links/buttons inside card faces (if any)
+            if (e.target.closest('a') || e.target.closest('button')) return;
+            
+            card.classList.toggle('flipped');
+            const isFlipped = card.classList.contains('flipped');
+            
+            gsap.to(cardInner, {
+                rotateY: isFlipped ? 180 : 0,
+                rotateX: 0,
+                duration: 0.8,
+                ease: "back.out(1.4)",
+                overwrite: "auto"
+            });
+        });
+    }
 };
+
+let globalCertsData = [];
 
 if (document.readyState === 'loading') {
 
@@ -693,8 +897,40 @@ if (document.readyState === 'loading') {
             const res = await fetch('data.json');
             if (!res.ok) throw new Error('Failed to fetch content');
             const savedData = await res.json();
+            globalCertsData = savedData.certsData || [];
 
             if (Object.keys(savedData).length > 0) {
+                // Apply theme preset
+                const themePreset = savedData.themePreset || 'blue';
+                Array.from(document.body.classList).forEach(cls => {
+                    if (cls.startsWith('theme-')) {
+                        document.body.classList.remove(cls);
+                    }
+                });
+                document.body.classList.add(`theme-${themePreset}`);
+
+                // Apply animation preset
+                const animationPreset = savedData.animationPreset || 'matrix';
+                window.animationPreset = animationPreset;
+                Array.from(document.body.classList).forEach(cls => {
+                    if (cls.startsWith('anim-')) {
+                        document.body.classList.remove(cls);
+                    }
+                });
+                document.body.classList.add(`anim-${animationPreset}`);
+
+                // Apply profile card animation theme preset
+                const profileAnimPreset = savedData.profileAnimPreset || 'scanner';
+                const cyberFrame = document.querySelector('.cyber-image-frame');
+                if (cyberFrame) {
+                    Array.from(cyberFrame.classList).forEach(cls => {
+                        if (cls.startsWith('prof-anim-')) {
+                            cyberFrame.classList.remove(cls);
+                        }
+                    });
+                    cyberFrame.classList.add(`prof-anim-${profileAnimPreset}`);
+                }
+
                 // DOMPurify is loaded in index.html
                 // Basic text fields
                 const textFields = {
@@ -741,18 +977,21 @@ if (document.readyState === 'loading') {
 
                 // Experience section
                 if (savedData.experienceData && Array.isArray(savedData.experienceData)) {
-                    const expContainer = document.querySelector('.timeline');
+                    const expContainer = document.getElementById('experience-container');
                     if (expContainer) {
                         expContainer.innerHTML = '';
                         savedData.experienceData.forEach(exp => {
                             let html = `
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <div class="timeline-date">${exp.date}</div>
-                                    <h3 class="timeline-title">${exp.title}</h3>
-                                    <h4 class="timeline-company">${exp.company}</h4>
-                                    <p class="timeline-description">${exp.description}</p>
+                            <div class="project-card bento-large">
+                                <div class="project-content">
+                                    <div class="timeline-date" style="color: var(--accent-color); font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                        ${exp.date}
+                                    </div>
+                                    <h3>${exp.title}</h3>
+                                    <h4 style="color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500;">
+                                        ${exp.company}
+                                    </h4>
+                                    <p style="margin-bottom: 0;">${exp.description}</p>
                                 </div>
                             </div>
                             `;
@@ -763,15 +1002,19 @@ if (document.readyState === 'loading') {
 
                 // Skills section
                 if (savedData.skillsData && Array.isArray(savedData.skillsData)) {
-                    const skillsContainer = document.querySelector('.skills-grid');
+                    const skillsContainer = document.getElementById('skills-container');
                     if (skillsContainer) {
                         skillsContainer.innerHTML = '';
-                        savedData.skillsData.forEach(skillCat => {
+                        savedData.skillsData.forEach((skillCat) => {
                             let skillsList = skillCat.skills.map(s => `<li>${s}</li>`).join('');
                             let html = `
-                            <div class="skill-category">
-                                <h3>${skillCat.category}</h3>
-                                <ul>${skillsList}</ul>
+                            <div class="skill-category project-card bento-third">
+                                <div class="project-content">
+                                    <h3>${skillCat.category}</h3>
+                                    <ul class="skill-list">
+                                        ${skillsList}
+                                    </ul>
+                                </div>
                             </div>
                             `;
                             skillsContainer.innerHTML += DOMPurify.sanitize(html);
@@ -781,30 +1024,66 @@ if (document.readyState === 'loading') {
 
                 // Projects section
                 if (savedData.projectsData && Array.isArray(savedData.projectsData)) {
-                    const projectsContainer = document.querySelector('.bento-grid');
+                    const projectsContainer = document.getElementById('projects-container');
                     if (projectsContainer) {
                         projectsContainer.innerHTML = '';
-                        savedData.projectsData.forEach(proj => {
-                            let tags = proj.tags.map(t => `<span class="tag">${t}</span>`).join('');
+                        savedData.projectsData.forEach((proj, idx) => {
+                            let tags = proj.tags.map(t => `<span>${t}</span>`).join('');
+                            let bentoClass = idx === 0 ? 'bento-large' : 'bento-small';
                             let html = `
-                            <div class="project-card bento-large">
-                                <div class="card-glow"></div>
-                                <div class="card-content">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                                        <div>
-                                            <h3 style="color: var(--secondary-color); font-family: 'Fira Code', monospace; font-size: 0.9rem;">${proj.category || 'project'}</h3>
-                                            <h2 style="font-size: 1.5rem; margin: 0.5rem 0;">${proj.title}</h2>
-                                        </div>
-                                        <a href="${proj.link}" class="project-link" style="color: white; text-decoration: none; font-size: 1.5rem;">↗</a>
-                                    </div>
-                                    <div class="project-tags" style="margin-bottom: 1rem;">
+                            <div class="project-card ${bentoClass}" data-category="${proj.category || 'project'}">
+                                <div class="project-content">
+                                    <h3>${proj.title}</h3>
+                                    <p>${proj.description}</p>
+                                    <div class="tech-stack" style="margin-bottom: 1.5rem;">
                                         ${tags}
                                     </div>
-                                    <p style="color: var(--text-color); opacity: 0.8; margin-bottom: 1rem;">${proj.description}</p>
+                                    <div class="project-links">
+                                        <a href="${proj.link}" class="btn btn-primary" ${proj.link === '#' ? 'onclick="return false;"' : ''}>View Architecture</a>
+                                    </div>
                                 </div>
                             </div>
                             `;
                             projectsContainer.innerHTML += DOMPurify.sanitize(html);
+                        });
+                    }
+                }
+
+                // Certifications section
+                if (savedData.certsData && Array.isArray(savedData.certsData)) {
+                    const certsContainer = document.getElementById('certs-container');
+                    if (certsContainer) {
+                        certsContainer.innerHTML = '';
+                        savedData.certsData.forEach(cert => {
+                            let fileHtml = cert.file ? `
+                            <div class="project-links">
+                                <a href="${cert.file}" target="_blank" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                    View Document
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px; display: inline-block; vertical-align: middle;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                                </a>
+                            </div>
+                            ` : '';
+                            
+                            let html = `
+                            <div class="project-card bento-third cert-card">
+                                <div class="project-content">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                        <div class="cert-icon" style="color: var(--success-color);">
+                                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 11 11 13 15 9"></polyline></svg>
+                                        </div>
+                                        <span class="timeline-date" style="color: var(--accent-color); font-family: 'Space Mono', monospace; font-size: 0.85rem;">
+                                            ${cert.date}
+                                        </span>
+                                    </div>
+                                    <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; line-height: 1.4;">${cert.title}</h3>
+                                    <h4 style="color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 500; font-size: 0.9rem;">
+                                        ${cert.issuer}
+                                    </h4>
+                                    ${fileHtml}
+                                </div>
+                            </div>
+                            `;
+                            certsContainer.innerHTML += DOMPurify.sanitize(html);
                         });
                     }
                 }

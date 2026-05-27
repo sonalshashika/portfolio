@@ -46,6 +46,7 @@
             <li><a href="#experience">Experience</a></li>
             <li><a href="#skills">Skills</a></li>
             <li><a href="#projects">Projects</a></li>
+            <li><a href="#certifications">Certificates</a></li>
             <li><a href="#terminal">Terminal</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
@@ -68,6 +69,67 @@
                 <div class="glow"></div>
             </div>
             <div class="container hero-container">
+                <div class="hero-image">
+                    <div class="card-3d-container">
+                        <div class="card-3d-inner">
+                            <!-- Card Front: Spade Frame & Profile -->
+                            <div class="card-3d-front">
+                                <div class="card-suit top-left">
+                                    <span class="card-val">A</span>
+                                    <span class="card-symbol">♠</span>
+                                </div>
+                                <div class="card-suit bottom-right">
+                                    <span class="card-val">A</span>
+                                    <span class="card-symbol">♠</span>
+                                </div>
+                                <div class="cyber-image-frame">
+                                    <div class="hud-bracket tl"></div>
+                                    <div class="hud-bracket tr"></div>
+                                    <div class="hud-bracket bl"></div>
+                                    <div class="hud-bracket br"></div>
+                                    <div class="scan-bar"></div>
+                                    <div class="profile-matrix-rain"></div>
+                                    <img src="images/profile.png" alt="Sonal Jayawardana" class="profile-img">
+                                    <div class="image-overlay"></div>
+                                </div>
+                                <div class="cyber-details">
+                                    <span class="cyber-tag">SYS_ID: SJ-2026</span>
+                                    <span class="cyber-status-dot"></span>
+                                    <span class="cyber-status">ONLINE</span>
+                                </div>
+                                <div class="holographic-shine"></div>
+                            </div>
+                            <!-- Card Back: System Info & Career Stats -->
+                            <div class="card-3d-back">
+                                <div class="card-back-pattern"></div>
+                                <div class="card-back-content">
+                                    <h3 class="card-back-title">CYBER ACE</h3>
+                                    <div class="card-back-divider"></div>
+                                    <div class="card-stats-list">
+                                        <div class="card-stat-row">
+                                            <span class="stat-name">CLASS:</span>
+                                            <span class="stat-val">IT EXECUTIVE</span>
+                                        </div>
+                                        <div class="card-stat-row">
+                                            <span class="stat-name">EXPERIENCE:</span>
+                                            <span class="stat-val">9+ YEARS</span>
+                                        </div>
+                                        <div class="card-stat-row">
+                                            <span class="stat-name">RELIABILITY:</span>
+                                            <span class="stat-val">100% UPTIME</span>
+                                        </div>
+                                        <div class="card-stat-row">
+                                            <span class="stat-name">SYSTEMS:</span>
+                                            <span class="stat-val">VMWARE · mikrotik</span>
+                                        </div>
+                                    </div>
+                                    <div class="card-back-barcode"></div>
+                                    <span class="card-back-tip">[CLICK TO FLIP]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hero-content">
                     <span class="badge">Executive – IT</span>
                     <h1>Sonal Shashika Darshana <span>Jayawardana</span></h1>
@@ -76,11 +138,6 @@
                     <div class="hero-actions">
                         <a href="#projects" class="btn btn-primary">View Projects</a>
                         <a href="#contact" class="btn btn-secondary">Contact Me</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="image-wrapper">
-                        <img src="images/profile.png" alt="Sonal Jayawardana" class="profile-img floating">
                     </div>
                 </div>
             </div>
@@ -105,7 +162,7 @@
                         <p>My career objective is to continuously drive technology innovation while
                             delivering robust, scalable hardware and software systems.</p>
                     </div>
-                    <div class="stats-grid">
+                    <div class="stats-grid" id="stats-container">
                         <div class="stat-card project-card">
                             <h3>9+</h3>
                             <p>Years Tech Experience</p>
@@ -130,7 +187,7 @@
                     <span class="subtitle">Career Path</span>
                     <h2>Professional <span class="gradient-text">Experience</span></h2>
                 </div>
-                <div class="bento-grid">
+                <div class="bento-grid" id="experience-container">
                     <div class="project-card bento-large">
                         <div class="project-content">
                             <div class="timeline-date"
@@ -166,11 +223,11 @@
             <div class="container">
                 <h2 class="section-title">02. <span class="gradient-text">Core Capabilities</span>
                 </h2>
-                <div class="bento-grid">
-                    <div class="skill-category project-card bento-large">
+                <div class="bento-grid" id="skills-container">
+                    <div class="skill-category project-card bento-third">
                         <div class="project-content">
                             <h3>Infrastructure & Virtualization</h3>
-                            <ul class="skill-list" style="columns: 2;">
+                            <ul class="skill-list">
                                 <li>VMWare ESXi & Hyper-V</li>
                                 <li>Active Directory & System Admin</li>
                                 <li>Hardware Engineering & Repair</li>
@@ -230,7 +287,7 @@
                     <button class="filter-btn" data-filter="automation">Automation</button>
                 </div>
 
-                <div class="bento-grid">
+                <div class="bento-grid" id="projects-container">
                     <!-- Featured Project -->
                     <div class="project-card bento-large" data-category="infrastructure">
                         <div class="project-content">
@@ -269,6 +326,19 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications Section -->
+        <section id="certifications" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="subtitle">Credentials</span>
+                    <h2>Verified <span class="gradient-text">Certifications</span></h2>
+                </div>
+                <div class="bento-grid" id="certs-container">
+                    <!-- Dynamic items loaded from data.json -->
                 </div>
             </div>
         </section>
@@ -350,6 +420,9 @@
                 <feTurbulence type="fractalNoise" baseFrequency="0.1 0.1" numOctaves="1" result="noise" />
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
             </filter>
+            <clipPath id="spade-clip" clipPathUnits="objectBoundingBox">
+                                <path d="M 0.5 0.12 C 0.5 0.12, 0.23 0.42, 0.23 0.58 C 0.23 0.73, 0.37 0.81, 0.5 0.70 C 0.63 0.81, 0.77 0.73, 0.77 0.58 C 0.77 0.42, 0.5 0.12, 0.5 0.12 Z M 0.5 0.65 C 0.47 0.75, 0.36 0.88, 0.36 0.88 L 0.64 0.88 C 0.64 0.88, 0.53 0.75, 0.5 0.65 Z" />
+            </clipPath>
         </defs>
     </svg>
 

@@ -28,8 +28,8 @@ if (fs.existsSync(ENV_FILE)) {
     console.log(`=========================================\n`);
 }
 
-const ADMIN_USER = process.env.ADMIN_USER || envVars.ADMIN_USER || 'admin';
-const ADMIN_PASS = process.env.ADMIN_PASS || envVars.ADMIN_PASS;
+let ADMIN_USER = process.env.ADMIN_USER || envVars.ADMIN_USER || 'admin';
+let ADMIN_PASS = process.env.ADMIN_PASS || envVars.ADMIN_PASS;
 
 function checkAuth(req) {
     if (!ADMIN_PASS) return false;
@@ -54,7 +54,8 @@ const server = http.createServer((req, res) => {
     const normalizedPath = path.normalize(safeUrl).replace(/^(\.\.[\/\\])+/, '').replace(/\\/g, '/');
 
     const isAdminRoute = normalizedPath.startsWith('/admin');
-    if (isAdminRoute || (normalizedPath === '/api/content' && req.method === 'POST')) {
+    const isPostApi = (normalizedPath === '/api/content' || normalizedPath === '/api/upload' || normalizedPath === '/api/settings') && req.method === 'POST';
+    if (isAdminRoute || isPostApi) {
         if (!checkAuth(req)) {
             res.writeHead(401, {
                 'WWW-Authenticate': 'Basic realm="Control Panel"',
@@ -101,6 +102,95 @@ const server = http.createServer((req, res) => {
             });
             return;
         }
+    }
+
+    if (normalizedPath === '/api/upload' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const payload = JSON.parse(body);
+                const { filename, base64 } = payload;
+                if (!filename || !base64) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing filename or base64 data' }));
+                    return;
+                }
+
+                const matches = base64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+                let fileBuffer;
+                if (matches && matches.length === 3) {
+                    fileBuffer = Buffer.from(matches[2], 'base64');
+                } else {
+                    fileBuffer = Buffer.from(base64, 'base64');
+                }
+
+                const imagesDir = path.join(__dirname, 'images');
+                const certsDir = path.join(imagesDir, 'certificates');
+                if (!fs.existsSync(imagesDir)) {
+                    fs.mkdirSync(imagesDir);
+                }
+                if (!fs.existsSync(certsDir)) {
+                    fs.mkdirSync(certsDir);
+                }
+
+                let relativePath;
+                if (filename === 'profile.png' || filename === 'profile.jpg' || filename === 'profile.jpeg') {
+                    relativePath = 'images/profile.png';
+                } else {
+                    const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+                    relativePath = `images/certificates/${Date.now()}_${safeName}`;
+                }
+
+                const absolutePath = path.join(__dirname, relativePath);
+                fs.writeFile(absolutePath, fileBuffer, (err) => {
+                    if (err) {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Failed to write file' }));
+                    } else {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: true, url: relativePath }));
+                    }
+                });
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+        return;
+    }
+
+    if (normalizedPath === '/api/settings' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const payload = JSON.parse(body);
+                const { username, password } = payload;
+                if (!username || !password) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing username or password' }));
+                    return;
+                }
+
+                fs.writeFile(ENV_FILE, `ADMIN_USER=${username}\nADMIN_PASS=${password}\n`, 'utf8', (err) => {
+                    if (err) {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Failed to save settings' }));
+                    } else {
+                        ADMIN_USER = username;
+                        ADMIN_PASS = password;
+                        
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ success: true }));
+                    }
+                });
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+        return;
     }
 
     let filePath = path.join(__dirname, normalizedPath);
