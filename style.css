@@ -32,8 +32,162 @@
     --accent-hover: #1d4ed8;
     --glass-bg: rgba(0, 0, 0, 0.03);
     --glass-border: rgba(0, 0, 0, 0.1);
-    --nav-bg: rgba(248, 250, 252, 0.8);
+    --nav-bg: rgba(248, 250, 252, 0.92);
+    --matrix-green: #2563eb;
 }
+
+/* Light theme element overrides */
+.light-theme body::after {
+    opacity: 0.015; /* tone down CRT scanline in light mode */
+}
+
+.light-theme #neural-canvas {
+    opacity: 0.25; /* tone down particle canvas */
+}
+
+/* 3D card faces */
+.light-theme .card-3d-front {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: color-mix(in srgb, var(--accent-color) 30%, rgba(0,0,0,0.12));
+}
+
+.light-theme .card-3d-back {
+    background: rgba(240, 248, 255, 0.95);
+}
+
+/* Cyber image frame */
+.light-theme .cyber-image-frame {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Cyber details tag */
+.light-theme .cyber-details {
+    color: var(--text-secondary);
+}
+
+.light-theme .cyber-tag {
+    color: var(--text-primary);
+}
+
+/* Card back text */
+.light-theme .card-back-title {
+    color: var(--accent-color);
+}
+
+.light-theme .stat-name {
+    color: var(--text-secondary);
+}
+
+.light-theme .stat-val {
+    color: var(--text-primary);
+}
+
+/* Card suit badges */
+.light-theme .card-suit {
+    color: var(--accent-color);
+}
+
+/* Card back barcode */
+.light-theme .card-back-barcode {
+    filter: invert(1) hue-rotate(180deg) brightness(0.5);
+}
+
+/* Badge */
+.light-theme .badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--accent-color);
+    border-color: rgba(37, 99, 235, 0.25);
+}
+
+/* Section title */
+.light-theme .section-title {
+    color: var(--text-primary);
+}
+
+.light-theme .subtitle {
+    color: var(--accent-color);
+}
+
+/* Project / bento cards */
+.light-theme .bento-large {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(255,255,255,0.8));
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+.light-theme .bento-small,
+.light-theme .bento-third {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Terminal window */
+.light-theme .terminal-window {
+    background: #1e293b;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Skill category */
+.light-theme .skill-category h3 {
+    color: var(--accent-color);
+}
+
+/* Highlight cards */
+.light-theme .highlight-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Contact form */
+.light-theme .contact-form {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .form-group input,
+.light-theme .form-group textarea {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+/* Cyber cursor in light mode */
+.light-theme .cyber-cursor {
+    border-color: rgba(37, 99, 235, 0.6);
+}
+
+.light-theme .cyber-cursor-dot {
+    background: var(--accent-color);
+    box-shadow: 0 0 6px var(--accent-color);
+}
+
+/* Gradient text override for light mode */
+.light-theme .gradient-text {
+    background: linear-gradient(270deg, var(--accent-color), #0ea5e9, var(--accent-hover));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 5s ease infinite;
+}
+
+/* Matrix rain overlay in light mode — hide it */
+.light-theme .profile-matrix-rain {
+    opacity: 0 !important;
+}
+
+/* Preloader */
+.light-theme #preloader {
+    background: var(--bg-color);
+}
+
+.light-theme .loader-binary {
+    color: var(--accent-color);
+}
+
+.light-theme .loader-text {
+    color: var(--text-primary);
+}
+
 
 /* Color Theme Presets */
 body.theme-blue {

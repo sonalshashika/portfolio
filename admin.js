@@ -609,38 +609,92 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Added empty certification template.', 'info');
     });
 
-    // --- Load Data from API ---
+    // --- Detect server mode vs static/GitHub Pages mode ---
+    let isServerAvailable = false;
+
+    function showServerBanner(available) {
+        isServerAvailable = available;
+        const existingBanner = document.getElementById('server-mode-banner');
+        if (existingBanner) existingBanner.remove();
+
+        const header = document.querySelector('.main-header');
+        const banner = document.createElement('div');
+        banner.id = 'server-mode-banner';
+
+        if (available) {
+            banner.className = 'server-banner server-online';
+            banner.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <strong>Server Online</strong> — Full edit & save mode active.
+            `;
+        } else {
+            banner.className = 'server-banner server-offline';
+            banner.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <strong>Read-Only Mode</strong> — Viewing static data from GitHub Pages. To save changes, run <code>node server.js</code> locally and access <code>localhost:8000/admin.html</code>.
+            `;
+            // Disable save button
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.title = 'Start local server to enable saving';
+            }
+        }
+
+        if (header) header.after(banner);
+    }
+
+    // --- Load Data: try API first, fall back to static data.json ---
+    function populateFormFields(data) {
+        appState = data;
+        simpleFields.forEach(field => {
+            const el = document.getElementById(field);
+            if (el && appState[field] !== undefined) {
+                el.value = appState[field];
+            }
+        });
+        renderExperience();
+        renderSkills();
+        renderProjects();
+        renderCertifications();
+    }
+
     fetch('/api/content')
         .then(res => {
-            if (!res.ok) throw new Error('Data endpoint not available');
+            if (!res.ok) throw new Error('API not available');
             return res.json();
         })
         .then(data => {
-            appState = data;
-            
-            // 1. Populate simple text fields
-            simpleFields.forEach(field => {
-                const el = document.getElementById(field);
-                if (el && appState[field] !== undefined) {
-                    el.value = appState[field];
-                }
-            });
-
-            // 2. Render complex sections
-            renderExperience();
-            renderSkills();
-            renderProjects();
-            renderCertifications();
-            
+            showServerBanner(true);
+            populateFormFields(data);
             showToast('Portfolio configuration loaded successfully.', 'info');
         })
-        .catch(err => {
-            console.error('Failed to load portfolio state:', err);
-            showToast('Failed to load portfolio configurations.', 'error');
+        .catch(() => {
+            // API unavailable — try reading static data.json directly
+            fetch('data.json')
+                .then(res => {
+                    if (!res.ok) throw new Error('data.json not found');
+                    return res.json();
+                })
+                .then(data => {
+                    showServerBanner(false);
+                    populateFormFields(data);
+                    showToast('Loaded static portfolio data (read-only).', 'info');
+                })
+                .catch(() => {
+                    showServerBanner(false);
+                    showToast('Could not load portfolio data.', 'error');
+                });
         });
+
 
     // --- Save Data Trigger ---
     document.getElementById('saveBtn').addEventListener('click', () => {
+        if (!isServerAvailable) {
+            showToast('Save is disabled in read-only mode. Run the local server to enable saving.', 'error');
+            return;
+        }
+
         // Collect simple text fields before saving
         simpleFields.forEach(field => {
             const el = document.getElementById(field);

@@ -782,3 +782,53 @@ textarea {
     flex-shrink: 0;
 }
 
+/* ─── Server-Mode Banner ─────────────────────────────────────── */
+.server-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 20px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    border-bottom: 1px solid transparent;
+}
+
+.server-banner svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.server-banner code {
+    background: rgba(0,0,0,0.25);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+}
+
+.server-online {
+    background: rgba(16, 185, 129, 0.12);
+    border-bottom-color: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+}
+
+.server-online svg {
+    color: #10b981;
+    stroke: #10b981;
+}
+
+.server-offline {
+    background: rgba(245, 158, 11, 0.12);
+    border-bottom-color: rgba(245, 158, 11, 0.25);
+    color: #fcd34d;
+}
+
+.server-offline svg {
+    color: #f59e0b;
+    stroke: #f59e0b;
+}
+
+.server-offline code {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fde68a;
+}
