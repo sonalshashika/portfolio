@@ -2,6 +2,9 @@ const init = () => {
     // Register GSAP Plugins
     gsap.registerPlugin(ScrollTrigger, TextPlugin);
 
+    // --- Touch Device Detection (must be first) ---
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
     // --- Lenis Smooth Scroll ---
     const lenis = new Lenis({ smoothWheel: true });
 
@@ -371,41 +374,43 @@ const init = () => {
         animateCanvas();
     }
 
-    // --- Spotlight & Kinetic 3D Hover Cards ---
-    document.querySelectorAll('.project-card, .bento-large, .bento-small, .bento-third, .stat-card, .skill-category, .timeline-item, .cert-card, .contact-content').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+    // --- Spotlight & Kinetic 3D Hover Cards (Desktop Only) ---
+    if (!isTouchDevice) {
+        document.querySelectorAll('.project-card, .bento-large, .bento-small, .bento-third, .stat-card, .skill-category, .timeline-item, .cert-card, .contact-content').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
 
-            // Spotlight
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
+                // Spotlight
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
 
-            // 3D Tilt Math
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg tilt
-            const rotateY = ((x - centerX) / centerX) * 5;
+                // 3D Tilt Math
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg tilt
+                const rotateY = ((x - centerX) / centerX) * 5;
 
-            gsap.to(card, {
-                rotateX: rotateX,
-                rotateY: rotateY,
-                transformPerspective: 1000,
-                ease: "power2.out",
-                duration: 0.4
+                gsap.to(card, {
+                    rotateX: rotateX,
+                    rotateY: rotateY,
+                    transformPerspective: 1000,
+                    ease: "power2.out",
+                    duration: 0.4
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotateX: 0,
+                    rotateY: 0,
+                    ease: "elastic.out(1, 0.3)",
+                    duration: 1.2
+                });
             });
         });
-
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-                rotateX: 0,
-                rotateY: 0,
-                ease: "elastic.out(1, 0.3)",
-                duration: 1.2
-            });
-        });
-    });
+    }
 
     // --- Advanced Scroll Animations ---
     // --- Project Filtering Logic ---
@@ -464,55 +469,62 @@ const init = () => {
         gsap.from(el, fromVars);
     });
 
-    // --- Magnetic Interactions ---
-    const magneticElements = document.querySelectorAll('.btn, .logo, .theme-toggle, .social-links a, .nav-links a');
-    magneticElements.forEach(el => {
-        el.addEventListener('mousemove', (e) => {
-            const rect = el.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            gsap.to(el, { x: x * 0.4, y: y * 0.4, duration: 0.4, ease: "power2.out" });
+    // --- Magnetic Interactions (Desktop Only) ---
+    if (!isTouchDevice) {
+        const magneticElements = document.querySelectorAll('.btn, .logo, .theme-toggle, .social-links a, .nav-links a');
+        magneticElements.forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(el, { x: x * 0.4, y: y * 0.4, duration: 0.4, ease: "power2.out" });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+            });
         });
-        el.addEventListener('mouseleave', () => {
-            gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
-        });
-    });
+    }
 
     // --- Interactive Mouse Trail & Cyber Cursor ---
     const cyberCursor = document.querySelector('.cyber-cursor');
     const cyberCursorDot = document.querySelector('.cyber-cursor-dot');
 
-    document.addEventListener('mousemove', (e) => {
-        // Move Cyber Cursor
-        if (cyberCursor && cyberCursorDot) {
-            cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0)`;
-            cyberCursorDot.style.transform = `translate3d(${e.clientX - 3}px, ${e.clientY - 3}px, 0)`;
+    if (!isTouchDevice) {
+        document.addEventListener('mousemove', (e) => {
+            // Move Cyber Cursor
+            if (cyberCursor && cyberCursorDot) {
+                cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0)`;
+                cyberCursorDot.style.transform = `translate3d(${e.clientX - 3}px, ${e.clientY - 3}px, 0)`;
 
-            // Lock-on logic is handled by css transform, so we just update pos here
-            if (cyberCursor.classList.contains('lock-on')) {
-                cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0) scale(0.6) rotate(45deg)`;
+                // Lock-on logic is handled by css transform, so we just update pos here
+                if (cyberCursor.classList.contains('lock-on')) {
+                    cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0) scale(0.6) rotate(45deg)`;
+                }
             }
-        }
 
-        const trail = document.createElement('div');
-        trail.className = 'trail-particle';
-        trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px';
-        document.body.appendChild(trail);
-        gsap.to(trail, { y: (Math.random() - 0.5) * 100, x: (Math.random() - 0.5) * 100, opacity: 0, scale: 0.1, duration: 1, onComplete: () => trail.remove() });
-    });
+            const trail = document.createElement('div');
+            trail.className = 'trail-particle';
+            trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px';
+            document.body.appendChild(trail);
+            gsap.to(trail, { y: (Math.random() - 0.5) * 100, x: (Math.random() - 0.5) * 100, opacity: 0, scale: 0.1, duration: 1, onComplete: () => trail.remove() });
+        });
 
-    // Cyber Cursor Hover Lock-on
-    const clickables = document.querySelectorAll('a, button, .project-card, .timeline-item, input, textarea');
-    clickables.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            if (cyberCursor) cyberCursor.classList.add('lock-on');
-            if (cyberCursorDot) cyberCursorDot.classList.add('lock-on');
+        // Cyber Cursor Hover Lock-on
+        const clickables = document.querySelectorAll('a, button, .project-card, .timeline-item, input, textarea');
+        clickables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (cyberCursor) cyberCursor.classList.add('lock-on');
+                if (cyberCursorDot) cyberCursorDot.classList.add('lock-on');
+            });
+            el.addEventListener('mouseleave', () => {
+                if (cyberCursor) cyberCursor.classList.remove('lock-on');
+                if (cyberCursorDot) cyberCursorDot.classList.remove('lock-on');
+            });
         });
-        el.addEventListener('mouseleave', () => {
-            if (cyberCursor) cyberCursor.classList.remove('lock-on');
-            if (cyberCursorDot) cyberCursorDot.classList.remove('lock-on');
-        });
-    });
+    } else {
+        if (cyberCursor) cyberCursor.style.display = 'none';
+        if (cyberCursorDot) cyberCursorDot.style.display = 'none';
+    }
 
     // --- Text Decryption Engine ---
     function decryptText(element) {
@@ -790,11 +802,13 @@ const init = () => {
         });
     }
 
-    // --- Project Hover Glitch ---
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('mouseenter', () => card.classList.add('glitch-active'));
-        card.addEventListener('mouseleave', () => card.classList.remove('glitch-active'));
-    });
+    // --- Project Hover Glitch (Desktop Only) ---
+    if (!isTouchDevice) {
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', () => card.classList.add('glitch-active'));
+            card.addEventListener('mouseleave', () => card.classList.remove('glitch-active'));
+        });
+    }
 
     // --- 3D Interactive Playing Card (Ace of Spades) ---
     const card = document.querySelector('.card-3d-container');
@@ -802,73 +816,76 @@ const init = () => {
     const shine = document.querySelector('.holographic-shine');
 
     if (card && cardInner) {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left; // x position within the element.
-            const y = e.clientY - rect.top;  // y position within the element.
-            
-            const w = rect.width;
-            const h = rect.height;
-            
-            // Normalize coordinate system: bounds [-0.5, 0.5]
-            const px = (x / w) - 0.5;
-            const py = (y / h) - 0.5;
-            
-            // Maximum tilt angle of 25 degrees
-            const tiltX = -py * 25;
-            const tiltY = px * 25;
-            
-            const isFlipped = card.classList.contains('flipped');
-            
-            // Invert the tilt values on the back face so they tilt correctly relative to the viewer
-            const currentRotateX = isFlipped ? -tiltX : tiltX;
-            const currentRotateY = isFlipped ? (180 - tiltY) : tiltY;
-            
-            gsap.to(cardInner, {
-                rotateX: currentRotateX,
-                rotateY: currentRotateY,
-                duration: 0.1,
-                ease: "power2.out",
-                overwrite: "auto"
-            });
-            
-            // Move holographic shine overlay
-            if (shine) {
-                const shineX = (x / w) * 100;
-                const shineY = (y / h) * 100;
+        // Only bind 3D tilt tracking for non-touch devices
+        if (!isTouchDevice) {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x position within the element.
+                const y = e.clientY - rect.top;  // y position within the element.
                 
-                gsap.to(shine, {
-                    background: `radial-gradient(circle at ${shineX}% ${shineY}%, 
-                        rgba(255, 255, 255, 0.4) 0%, 
-                        rgba(244, 63, 94, 0.15) 25%, 
-                        rgba(59, 130, 246, 0.15) 50%, 
-                        transparent 75%)`,
+                const w = rect.width;
+                const h = rect.height;
+                
+                // Normalize coordinate system: bounds [-0.5, 0.5]
+                const px = (x / w) - 0.5;
+                const py = (y / h) - 0.5;
+                
+                // Maximum tilt angle of 25 degrees
+                const tiltX = -py * 25;
+                const tiltY = px * 25;
+                
+                const isFlipped = card.classList.contains('flipped');
+                
+                // Invert the tilt values on the back face so they tilt correctly relative to the viewer
+                const currentRotateX = isFlipped ? -tiltX : tiltX;
+                const currentRotateY = isFlipped ? (180 - tiltY) : tiltY;
+                
+                gsap.to(cardInner, {
+                    rotateX: currentRotateX,
+                    rotateY: currentRotateY,
                     duration: 0.1,
-                    overwrite: "auto"
-                });
-            }
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            const isFlipped = card.classList.contains('flipped');
-            
-            gsap.to(cardInner, {
-                rotateX: 0,
-                rotateY: isFlipped ? 180 : 0,
-                duration: 0.8,
-                ease: "elastic.out(1, 0.6)",
-                overwrite: "auto"
-            });
-            
-            if (shine) {
-                gsap.to(shine, {
-                    background: `radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, transparent 60%)`,
-                    duration: 0.8,
                     ease: "power2.out",
                     overwrite: "auto"
                 });
-            }
-        });
+                
+                // Move holographic shine overlay
+                if (shine) {
+                    const shineX = (x / w) * 100;
+                    const shineY = (y / h) * 100;
+                    
+                    gsap.to(shine, {
+                        background: `radial-gradient(circle at ${shineX}% ${shineY}%, 
+                            rgba(255, 255, 255, 0.4) 0%, 
+                            rgba(244, 63, 94, 0.15) 25%, 
+                            rgba(59, 130, 246, 0.15) 50%, 
+                            transparent 75%)`,
+                        duration: 0.1,
+                        overwrite: "auto"
+                    });
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                const isFlipped = card.classList.contains('flipped');
+                
+                gsap.to(cardInner, {
+                    rotateX: 0,
+                    rotateY: isFlipped ? 180 : 0,
+                    duration: 0.8,
+                    ease: "elastic.out(1, 0.6)",
+                    overwrite: "auto"
+                });
+                
+                if (shine) {
+                    gsap.to(shine, {
+                        background: `radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0) 0%, transparent 60%)`,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        overwrite: "auto"
+                    });
+                }
+            });
+        }
         
         card.addEventListener('click', (e) => {
             // Prevent flipping if click was on actual links/buttons inside card faces (if any)

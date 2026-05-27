@@ -541,10 +541,12 @@ ul {
     box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-.btn-primary:hover {
-    background: var(--accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+@media (hover: hover) {
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
 }
 
 .btn-secondary {
@@ -553,9 +555,11 @@ ul {
     color: var(--text-primary);
 }
 
-.btn-secondary:hover {
-    background: var(--glass-bg);
-    border-color: var(--accent-color);
+@media (hover: hover) {
+    .btn-secondary:hover {
+        background: var(--glass-bg);
+        border-color: var(--accent-color);
+    }
 }
 
 .w-100 {
@@ -1012,8 +1016,34 @@ ul {
     transition: opacity 0.4s ease;
 }
 
-.card-3d-container:hover .holographic-shine {
-    opacity: 0.85;
+@media (hover: hover) {
+    .card-3d-container:hover .holographic-shine {
+        opacity: 0.85;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-3d-container {
+        width: 280px;
+        height: 390px;
+    }
+    .cyber-image-frame {
+        width: 190px;
+        height: 240px;
+    }
+    .card-back-content {
+        padding: 25px 15px;
+    }
+    .card-back-title {
+        font-size: 1.15rem;
+    }
+    .stat-name, .stat-val {
+        font-size: 0.7rem;
+    }
+    .card-back-barcode {
+        width: 120px;
+        height: 30px;
+    }
 }
 
 /* Card Back Styles */
@@ -1132,8 +1162,10 @@ ul {
 }
 
 /* Hover effects */
-.card-3d-container:hover .cyber-image-frame .profile-img {
-    filter: brightness(1.15) contrast(1.1) grayscale(0);
+@media (hover: hover) {
+    .card-3d-container:hover .cyber-image-frame .profile-img {
+        filter: brightness(1.15) contrast(1.1) grayscale(0);
+    }
 }
 
 #portrait-3d-container {
@@ -1311,9 +1343,11 @@ ul {
     transition: var(--transition-base);
 }
 
-.highlight-card:hover {
-    border-color: var(--accent-color);
-    transform: translateX(10px);
+@media (hover: hover) {
+    .highlight-card:hover {
+        border-color: var(--accent-color);
+        transform: translateX(10px);
+    }
 }
 
 .highlight-card h3 {
@@ -1396,23 +1430,25 @@ ul {
     box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
 }
 
-.project-card:hover::before {
-    opacity: 1;
-}
+@media (hover: hover) {
+    .project-card:hover::before {
+        opacity: 1;
+    }
 
-.project-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    border-color: rgba(0, 255, 255, 0.6);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1);
-}
+    .project-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        border-color: rgba(0, 255, 255, 0.6);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.1);
+    }
 
-.light-theme .project-card:hover::before {
-    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 0, 0, 0.04), transparent 40%);
-}
+    .light-theme .project-card:hover::before {
+        background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(0, 0, 0, 0.04), transparent 40%);
+    }
 
-.light-theme .project-card:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    .light-theme .project-card:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
 }
 
 .project-card>* {
@@ -1501,10 +1537,12 @@ ul {
     flex-direction: column;
 }
 
-.project-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--accent-color);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+@media (hover: hover) {
+    .project-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--accent-color);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .project-image {
@@ -1640,9 +1678,11 @@ ul {
     transition: var(--transition-base);
 }
 
-.cert-card:hover {
-    border-color: var(--accent-color);
-    transform: translateY(-5px);
+@media (hover: hover) {
+    .cert-card:hover {
+        border-color: var(--accent-color);
+        transform: translateY(-5px);
+    }
 }
 
 /* Glitch Animations */
@@ -1747,8 +1787,10 @@ ul {
     transition: var(--transition-base);
 }
 
-.contact-card:hover {
-    border-color: var(--accent-color);
+@media (hover: hover) {
+    .contact-card:hover {
+        border-color: var(--accent-color);
+    }
 }
 
 .contact-form {
@@ -1822,7 +1864,8 @@ footer {
     }
 
     .hero-image {
-        width: 80%;
+        width: 100%;
+        max-width: 300px;
         margin: 0 auto;
     }
 }
@@ -1933,8 +1976,10 @@ body.anim-neon .project-card {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.4), 0 0 5px var(--accent-glow);
     transition: var(--transition-base), box-shadow 0.3s ease;
 }
-body.anim-neon .project-card:hover {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), 0 0 15px var(--accent-color);
+@media (hover: hover) {
+    body.anim-neon .project-card:hover {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2), 0 0 15px var(--accent-color);
+    }
 }
 body.anim-neon .badge {
     animation: neon-badge-pulse 2s infinite alternate;
@@ -1957,9 +2002,11 @@ body.anim-terminal .badge {
     border: 1px solid var(--accent-color) !important;
     box-shadow: none !important;
 }
-body.anim-terminal .project-card:hover {
-    background: rgba(0, 0, 0, 0.8) !important;
-    box-shadow: 0 0 15px var(--accent-color) !important;
+@media (hover: hover) {
+    body.anim-terminal .project-card:hover {
+        background: rgba(0, 0, 0, 0.8) !important;
+        box-shadow: 0 0 15px var(--accent-color) !important;
+    }
 }
 body.anim-terminal * {
     text-shadow: none !important;
