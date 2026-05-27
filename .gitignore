@@ -9,3 +9,4 @@ build/
 tmp/
 Caret/
 brain/
+.env
