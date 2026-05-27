@@ -687,7 +687,148 @@ const init = () => {
 };
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+
+    const loadDynamicContent = async () => {
+        try {
+            const res = await fetch('data.json');
+            if (!res.ok) throw new Error('Failed to fetch content');
+            const savedData = await res.json();
+
+            if (Object.keys(savedData).length > 0) {
+                // DOMPurify is loaded in index.html
+                // Basic text fields
+                const textFields = {
+                    'heroBadge': '.badge',
+                    'heroTagline': '.hero-content p',
+                    'stat1Value': '#stats-container .stat-card:nth-child(1) h3',
+                    'stat1Label': '#stats-container .stat-card:nth-child(1) p',
+                    'stat2Value': '#stats-container .stat-card:nth-child(2) h3',
+                    'stat2Label': '#stats-container .stat-card:nth-child(2) p',
+                    'stat3Value': '#stats-container .stat-card:nth-child(3) h3',
+                    'stat3Label': '#stats-container .stat-card:nth-child(3) p'
+                };
+
+                for (const [key, selector] of Object.entries(textFields)) {
+                    if (savedData[key]) {
+                        const el = document.querySelector(selector);
+                        if (el) {
+                            el.innerHTML = DOMPurify.sanitize(savedData[key]);
+                        }
+                    }
+                }
+
+                // First Name / Last Name formatting
+                if (savedData.heroFirstName || savedData.heroLastName) {
+                    const h1 = document.querySelector('.hero-content h1');
+                    if (h1) {
+                        const heroNameFirst = savedData.heroFirstName || '';
+                        const heroNameLast = savedData.heroLastName || '';
+                        h1.innerHTML = DOMPurify.sanitize(`${heroNameFirst}<span>${heroNameLast}</span>`);
+                    }
+                }
+
+                // About section
+                if (savedData.aboutP1 || savedData.aboutP2 || savedData.aboutP3) {
+                    const aboutTextContainer = document.querySelector('#about .about-text');
+                    if (aboutTextContainer) {
+                        let newHTML = '';
+                        if (savedData.aboutP1) newHTML += `<p>${savedData.aboutP1}</p>`;
+                        if (savedData.aboutP2) newHTML += `<p>${savedData.aboutP2}</p>`;
+                        if (savedData.aboutP3) newHTML += `<p>${savedData.aboutP3}</p>`;
+                        aboutTextContainer.innerHTML = DOMPurify.sanitize(newHTML);
+                    }
+                }
+
+                // Experience section
+                if (savedData.experienceData && Array.isArray(savedData.experienceData)) {
+                    const expContainer = document.querySelector('.timeline');
+                    if (expContainer) {
+                        expContainer.innerHTML = '';
+                        savedData.experienceData.forEach(exp => {
+                            let html = `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">${exp.date}</div>
+                                    <h3 class="timeline-title">${exp.title}</h3>
+                                    <h4 class="timeline-company">${exp.company}</h4>
+                                    <p class="timeline-description">${exp.description}</p>
+                                </div>
+                            </div>
+                            `;
+                            expContainer.innerHTML += DOMPurify.sanitize(html);
+                        });
+                    }
+                }
+
+                // Skills section
+                if (savedData.skillsData && Array.isArray(savedData.skillsData)) {
+                    const skillsContainer = document.querySelector('.skills-grid');
+                    if (skillsContainer) {
+                        skillsContainer.innerHTML = '';
+                        savedData.skillsData.forEach(skillCat => {
+                            let skillsList = skillCat.skills.map(s => `<li>${s}</li>`).join('');
+                            let html = `
+                            <div class="skill-category">
+                                <h3>${skillCat.category}</h3>
+                                <ul>${skillsList}</ul>
+                            </div>
+                            `;
+                            skillsContainer.innerHTML += DOMPurify.sanitize(html);
+                        });
+                    }
+                }
+
+                // Projects section
+                if (savedData.projectsData && Array.isArray(savedData.projectsData)) {
+                    const projectsContainer = document.querySelector('.bento-grid');
+                    if (projectsContainer) {
+                        projectsContainer.innerHTML = '';
+                        savedData.projectsData.forEach(proj => {
+                            let tags = proj.tags.map(t => `<span class="tag">${t}</span>`).join('');
+                            let html = `
+                            <div class="project-card bento-large">
+                                <div class="card-glow"></div>
+                                <div class="card-content">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                        <div>
+                                            <h3 style="color: var(--secondary-color); font-family: 'Fira Code', monospace; font-size: 0.9rem;">${proj.category || 'project'}</h3>
+                                            <h2 style="font-size: 1.5rem; margin: 0.5rem 0;">${proj.title}</h2>
+                                        </div>
+                                        <a href="${proj.link}" class="project-link" style="color: white; text-decoration: none; font-size: 1.5rem;">↗</a>
+                                    </div>
+                                    <div class="project-tags" style="margin-bottom: 1rem;">
+                                        ${tags}
+                                    </div>
+                                    <p style="color: var(--text-color); opacity: 0.8; margin-bottom: 1rem;">${proj.description}</p>
+                                </div>
+                            </div>
+                            `;
+                            projectsContainer.innerHTML += DOMPurify.sanitize(html);
+                        });
+                    }
+                }
+
+                // Re-bind hover events after dynamic content is added
+                if (typeof bindCardHoverEvents === 'function') {
+                    bindCardHoverEvents();
+                }
+                // Ensure GSAP ScrollTrigger picks up new elements
+                if (window.ScrollTrigger) {
+                    setTimeout(() => {
+                        ScrollTrigger.refresh();
+                    }, 100);
+                }
+            }
+        } catch (e) {
+            console.log('Using fallback static content', e);
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadDynamicContent();
+        init();
+    });
 } else {
     init();
 }

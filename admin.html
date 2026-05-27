@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Control Panel</h1>
+            <div class="actions">
+                <button id="saveBtn" class="btn primary">Save Changes</button>
+            </div>
+        </header>
+
+        <main id="editorForm">
+            <!-- Basic Fields -->
+            <section class="admin-section">
+                <h2>Hero Section</h2>
+                <div class="form-group">
+                    <label>Badge Text</label>
+                    <input type="text" id="heroBadge">
+                </div>
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="heroFirstName">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="heroLastName">
+                </div>
+                <div class="form-group">
+                    <label>Tagline</label>
+                    <textarea id="heroTagline"></textarea>
+                </div>
+            </section>
+
+            <section class="admin-section">
+                <h2>About Section</h2>
+                <div class="form-group">
+                    <label>Paragraph 1</label>
+                    <textarea id="aboutP1"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Paragraph 2 (HTML allowed)</label>
+                    <textarea id="aboutP2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Paragraph 3</label>
+                    <textarea id="aboutP3"></textarea>
+                </div>
+            </section>
+
+            <section class="admin-section">
+                <h2>Statistics</h2>
+                <div class="stat-group">
+                    <input type="text" id="stat1Value" placeholder="Value (e.g. 9+)">
+                    <input type="text" id="stat1Label" placeholder="Label">
+                </div>
+                <div class="stat-group">
+                    <input type="text" id="stat2Value" placeholder="Value">
+                    <input type="text" id="stat2Label" placeholder="Label">
+                </div>
+                <div class="stat-group">
+                    <input type="text" id="stat3Value" placeholder="Value">
+                    <input type="text" id="stat3Label" placeholder="Label">
+                </div>
+            </section>
+
+            <section class="admin-section">
+                <h2>JSON Data Arrays</h2>
+                <p>Edit the raw JSON for complex arrays (Experience, Skills, Projects).</p>
+                <div class="form-group">
+                    <label>Experience Data</label>
+                    <textarea id="experienceData" rows="10" class="code-font"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Skills Data</label>
+                    <textarea id="skillsData" rows="10" class="code-font"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Projects Data</label>
+                    <textarea id="projectsData" rows="10" class="code-font"></textarea>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>
