@@ -104,6 +104,7 @@ const server = http.createServer((req, res) => {
     safeUrl = safeUrl.split('?')[0];
     const normalizedPath = path.normalize(safeUrl).replace(/^(\.\.[\/\\])+/, '').replace(/\\/g, '/');
 
+    const isAdminRoute = normalizedPath.startsWith('/admin');
     const isPostApi = (
         normalizedPath === '/api/content' || 
         normalizedPath === '/api/upload' || 
