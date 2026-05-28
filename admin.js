@@ -642,6 +642,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (header) header.after(banner);
+        if (!available) {
+            refreshServerBanner();
+        }
     }
 
     // --- Load Data: try API first, fall back to static data.json ---
@@ -689,12 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Save Data Trigger ---
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        if (!isServerAvailable) {
-            showToast('Save is disabled in read-only mode. Run the local server to enable saving.', 'error');
-            return;
-        }
-
+    document.getElementById('saveBtn').addEventListener('click', async () => {
         // Collect simple text fields before saving
         simpleFields.forEach(field => {
             const el = document.getElementById(field);
@@ -703,25 +701,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // POST JSON data to the Server
-        fetch('/api/content', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(appState)
-        })
-        .then(res => {
-            if (res.ok) {
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            if (isServerAvailable) {
+                // Local server mode
+                const res = await fetch('/api/content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(appState)
+                });
+                if (!res.ok) throw new Error('Save failed');
                 showToast('All modifications saved successfully!', 'success');
             } else {
-                throw new Error('Save failed');
+                // GitHub API mode
+                const s = getGhSettings();
+                if (!s.owner || !s.repo || !s.token) {
+                    showToast('Save is disabled in read-only mode. Configure GitHub Integration in Settings to save from GitHub Pages.', 'error');
+                    return;
+                }
+                await saveViaGitHub(appState);
+                showToast('✅ Saved! Committed to GitHub — Pages will rebuild in ~1 min.', 'success');
             }
-        })
-        .catch(err => {
-            console.error('Error saving portfolio configurations:', err);
-            showToast('An error occurred. Failed to save changes.', 'error');
-        });
+        } catch (err) {
+            console.error('Save error:', err);
+            showToast(`Save failed: ${err.message}`, 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
     });
 
     // --- Settings & Credentials Form ---
@@ -778,4 +789,214 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // ─── GitHub API Integration ──────────────────────────────────────
+    const GH_STORAGE_KEY = 'portfolio_gh_settings';
+
+    function getGhSettings() {
+        try {
+            return JSON.parse(localStorage.getItem(GH_STORAGE_KEY)) || {};
+        } catch { return {}; }
+    }
+
+    function saveGhSettings(settings) {
+        localStorage.setItem(GH_STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    function setGithubStatusBadge(connected) {
+        const statusEl = document.getElementById('githubIntegrationStatus');
+        if (!statusEl) return;
+        if (connected) {
+            statusEl.innerHTML = `
+                <div class="gh-status-badge gh-connected">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    GitHub connected — Save will commit directly to your repository
+                </div>`;
+        } else {
+            statusEl.innerHTML = '';
+        }
+    }
+
+    // Populate fields from localStorage on load
+    function loadGhSettingsUI() {
+        const s = getGhSettings();
+        const ownerEl = document.getElementById('githubOwner');
+        const repoEl  = document.getElementById('githubRepo');
+        const tokenEl = document.getElementById('githubToken');
+        if (ownerEl && s.owner) ownerEl.value = s.owner;
+        if (repoEl  && s.repo)  repoEl.value  = s.repo;
+        if (tokenEl && s.token) tokenEl.value  = s.token;
+        if (s.owner && s.repo && s.token) {
+            setGithubStatusBadge(true);
+            // Update server banner to show GitHub mode
+            refreshServerBanner();
+        }
+    }
+
+    function refreshServerBanner() {
+        const s = getGhSettings();
+        const hasGitHub = !!(s.owner && s.repo && s.token);
+        if (!isServerAvailable && hasGitHub) {
+            const banner = document.getElementById('server-mode-banner');
+            if (banner) {
+                banner.className = 'server-banner server-github';
+                banner.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <strong>GitHub Mode</strong> — Save will commit directly to <code>${s.owner}/${s.repo}</code> and trigger a Pages rebuild.
+                `;
+                // Re-enable save button in GitHub mode
+                const saveBtn = document.getElementById('saveBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.title = '';
+                }
+            }
+        }
+    }
+
+    // Save via GitHub Contents API
+    async function saveViaGitHub(jsonData) {
+        const s = getGhSettings();
+        if (!s.owner || !s.repo || !s.token) {
+            throw new Error('GitHub settings not configured');
+        }
+
+        const apiBase = `https://api.github.com/repos/${s.owner}/${s.repo}/contents/data.json`;
+        const headers = {
+            'Authorization': `Bearer ${s.token}`,
+            'Accept': 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28'
+        };
+
+        // Step 1: Get current file SHA (required for update)
+        const getRes = await fetch(apiBase, { headers });
+        let sha = null;
+        if (getRes.ok) {
+            const fileInfo = await getRes.json();
+            sha = fileInfo.sha;
+        } else if (getRes.status !== 404) {
+            const err = await getRes.json();
+            throw new Error(err.message || 'Failed to fetch file info from GitHub');
+        }
+
+        // Step 2: Encode content as base64
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
+
+        // Step 3: Commit the new content
+        const body = {
+            message: 'Update portfolio data via admin panel',
+            content,
+            ...(sha ? { sha } : {})
+        };
+
+        const putRes = await fetch(apiBase, {
+            method: 'PUT',
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!putRes.ok) {
+            const err = await putRes.json();
+            throw new Error(err.message || 'GitHub commit failed');
+        }
+
+        return await putRes.json();
+    }
+
+    // Wire up settings buttons
+    const saveGhBtn   = document.getElementById('saveGithubSettingsBtn');
+    const testGhBtn   = document.getElementById('testGithubConnectionBtn');
+    const clearGhBtn  = document.getElementById('clearGithubSettingsBtn');
+    const toggleToken = document.getElementById('toggleTokenVisibility');
+
+    if (toggleToken) {
+        toggleToken.addEventListener('click', () => {
+            const inp = document.getElementById('githubToken');
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                toggleToken.title = 'Hide token';
+            } else {
+                inp.type = 'password';
+                toggleToken.title = 'Show token';
+            }
+        });
+    }
+
+    if (saveGhBtn) {
+        saveGhBtn.addEventListener('click', () => {
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo  = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!owner || !repo || !token) {
+                showToast('Please fill in all three GitHub fields.', 'error');
+                return;
+            }
+
+            saveGhSettings({ owner, repo, token });
+            setGithubStatusBadge(true);
+            refreshServerBanner();
+            showToast('GitHub settings saved to browser. You can now save from GitHub Pages!', 'success');
+        });
+    }
+
+    if (testGhBtn) {
+        testGhBtn.addEventListener('click', async () => {
+            const owner = document.getElementById('githubOwner').value.trim();
+            const repo  = document.getElementById('githubRepo').value.trim();
+            const token = document.getElementById('githubToken').value.trim();
+
+            if (!owner || !repo || !token) {
+                showToast('Fill in all GitHub fields before testing.', 'error');
+                return;
+            }
+
+            testGhBtn.textContent = 'Testing...';
+            testGhBtn.disabled = true;
+
+            try {
+                const res = await fetch(
+                    `https://api.github.com/repos/${owner}/${repo}/contents/data.json`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/vnd.github+json'
+                        }
+                    }
+                );
+                if (res.ok) {
+                    showToast('✅ Connection successful! Repository and token are valid.', 'success');
+                    setGithubStatusBadge(true);
+                } else if (res.status === 401) {
+                    showToast('❌ Invalid token. Check your Personal Access Token.', 'error');
+                } else if (res.status === 404) {
+                    showToast('❌ Repository or file not found. Check owner/repo name.', 'error');
+                } else {
+                    showToast(`❌ GitHub API error: ${res.status}`, 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error. Check your connection.', 'error');
+            } finally {
+                testGhBtn.textContent = 'Test Connection';
+                testGhBtn.disabled = false;
+            }
+        });
+    }
+
+    if (clearGhBtn) {
+        clearGhBtn.addEventListener('click', () => {
+            localStorage.removeItem(GH_STORAGE_KEY);
+            document.getElementById('githubOwner').value = '';
+            document.getElementById('githubRepo').value = '';
+            document.getElementById('githubToken').value = '';
+            setGithubStatusBadge(false);
+            showToast('GitHub settings cleared from browser.', 'info');
+            // Re-show offline banner
+            showServerBanner(false);
+        });
+    }
+
+    // Load GitHub settings into UI on startup
+    loadGhSettingsUI();
 });
+

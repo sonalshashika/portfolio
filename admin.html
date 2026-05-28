@@ -287,7 +287,7 @@
                     </div>
 
                     <!-- Security Credentials Settings -->
-                    <div class="card panel-card">
+                    <div class="card panel-card" style="margin-bottom: 2rem;">
                         <div class="card-header">
                             <h2>Security Settings</h2>
                             <p>Update your admin panel login credentials. Changing these requires instantly re-authenticating.</p>
@@ -314,7 +314,52 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- GitHub Integration Settings -->
+                    <div class="card panel-card">
+                        <div class="card-header">
+                            <h2>
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align:middle;margin-right:8px;opacity:0.85;"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                                GitHub Integration
+                            </h2>
+                            <p>Connect your GitHub repository to enable saving directly from GitHub Pages. Your token is stored only in this browser — it is never sent anywhere except GitHub's API.</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="github-integration-status" id="githubIntegrationStatus"></div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="githubOwner">Repository Owner (username)</label>
+                                    <input type="text" id="githubOwner" placeholder="e.g. sonalshashika">
+                                </div>
+                                <div class="form-group">
+                                    <label for="githubRepo">Repository Name</label>
+                                    <input type="text" id="githubRepo" placeholder="e.g. portfolio">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="githubToken">
+                                    Personal Access Token (PAT)
+                                    <a href="https://github.com/settings/tokens/new?scopes=contents&description=Portfolio+Admin" target="_blank" class="label-link">
+                                        Generate token →
+                                    </a>
+                                </label>
+                                <div class="token-input-wrapper">
+                                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+                                    <button type="button" id="toggleTokenVisibility" class="btn-icon" title="Show/hide token">
+                                        <svg id="eyeIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                </div>
+                                <span class="field-hint">Needs <code>contents: write</code> scope. Stored only in your browser's localStorage.</span>
+                            </div>
+                            <div style="display:flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                                <button type="button" id="saveGithubSettingsBtn" class="btn primary">Save GitHub Settings</button>
+                                <button type="button" id="testGithubConnectionBtn" class="btn secondary">Test Connection</button>
+                                <button type="button" id="clearGithubSettingsBtn" class="btn secondary danger-hover">Clear Token</button>
+                            </div>
+                        </div>
+                    </div>
                 </section>
+
             </div>
         </main>
     </div>

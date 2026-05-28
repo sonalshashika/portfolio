@@ -832,3 +832,66 @@ textarea {
     background: rgba(245, 158, 11, 0.15);
     color: #fde68a;
 }
+
+/* GitHub Mode styles */
+.server-github {
+    background: rgba(139, 92, 246, 0.12);
+    border-bottom-color: rgba(139, 92, 246, 0.25);
+    color: #c084fc;
+}
+.server-github svg {
+    fill: #a78bfa;
+}
+.server-github code {
+    background: rgba(139, 92, 246, 0.15);
+    color: #ddd6fe;
+}
+
+.github-integration-status {
+    margin-bottom: 1.2rem;
+}
+.gh-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    font-weight: 500;
+}
+.gh-connected {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+}
+.gh-connected svg {
+    stroke: #10b981;
+}
+.token-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.token-input-wrapper input {
+    flex: 1;
+}
+.label-link {
+    font-size: 0.78rem;
+    color: var(--accent-color);
+    margin-left: 10px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.field-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+.field-hint code {
+    background: rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
