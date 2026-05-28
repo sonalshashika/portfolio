@@ -1022,6 +1022,15 @@ if (document.readyState === 'loading') {
                     }
                 }
 
+                // Dynamically update certifications count based on certsData length
+                if (savedData.certsData && Array.isArray(savedData.certsData)) {
+                    const certsCountVal = savedData.certsData.length;
+                    const certsStatEl = document.querySelector('#stats-container .stat-card:nth-child(3) h3');
+                    if (certsStatEl) {
+                        certsStatEl.innerHTML = DOMPurify.sanitize(`${certsCountVal}+`);
+                    }
+                }
+
                 // First Name / Last Name formatting
                 if (savedData.heroFirstName || savedData.heroLastName) {
                     const h1 = document.querySelector('.hero-content h1');
