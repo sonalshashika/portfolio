@@ -75,19 +75,22 @@
       "title": "Vocational Training Authority (VTA) – IT Support",
       "issuer": "VTA",
       "date": "2018",
-      "file": ""
+      "file": "images/certificates/1779941752114_dara_page-0001.jpg",
+      "file2": ""
     },
     {
       "title": "CompTIA A+ Equivalent",
       "issuer": "A+ Academy",
       "date": "2020",
-      "file": ""
+      "file": "",
+      "file2": ""
     },
     {
       "title": "Advanced Networking & Administration",
       "issuer": "LITS",
       "date": "2022",
-      "file": ""
+      "file": "",
+      "file2": ""
     }
   ],
   "themePreset": "purple",

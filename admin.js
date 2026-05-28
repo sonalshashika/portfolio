@@ -489,17 +489,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     
-                    <div class="proof-upload-block">
+                    <div class="proof-upload-block" style="margin-bottom: 0.75rem;">
                         <div class="proof-info-side">
-                            <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">Verification Document</label>
-                            <div class="proof-path-text">
+                            <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">Front Side / Page 1</label>
+                            <div class="proof-path-text front-path">
                                 ${cert.file ? `<a href="${cert.file}" target="_blank">${escapeHtml(cert.file)} ↗</a>` : 'No file uploaded yet'}
                             </div>
                         </div>
                         <div class="proof-actions-side">
-                            <input type="file" class="cert-file-input" accept="image/*,application/pdf" style="display:none;" id="cert-input-${idx}">
-                            <button type="button" class="btn secondary btn-upload" onclick="document.getElementById('cert-input-${idx}').click()">
-                                Upload Proof (PDF/Image)
+                            <input type="file" class="cert-file-input cert-front-input" accept="image/*,application/pdf" style="display:none;" id="cert-front-${idx}">
+                            <button type="button" class="btn secondary btn-upload btn-front" onclick="document.getElementById('cert-front-${idx}').click()">
+                                Upload Front (PDF/Image)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="proof-upload-block">
+                        <div class="proof-info-side">
+                            <label style="font-size: 0.7rem; margin-bottom: 0.25rem;">Back Side / Page 2 (Optional)</label>
+                            <div class="proof-path-text back-path">
+                                ${cert.file2 ? `<a href="${cert.file2}" target="_blank">${escapeHtml(cert.file2)} ↗</a>` : 'No file uploaded yet'}
+                            </div>
+                        </div>
+                        <div class="proof-actions-side">
+                            <input type="file" class="cert-file-input cert-back-input" accept="image/*,application/pdf" style="display:none;" id="cert-back-${idx}">
+                            <button type="button" class="btn secondary btn-upload btn-back" onclick="document.getElementById('cert-back-${idx}').click()">
+                                Upload Back (PDF/Image)
                             </button>
                         </div>
                     </div>
@@ -527,31 +542,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('Certification item removed locally.', 'info');
             });
             
-            // File Upload Listener
-            const uploadBtn = card.querySelector('.btn-upload');
-            const fileInput = card.querySelector('.cert-file-input');
-            fileInput.addEventListener('change', (e) => {
+            // File Upload Listener - Front
+            const fileInputFront = card.querySelector('.cert-front-input');
+            const uploadBtnFront = card.querySelector('.btn-front');
+            fileInputFront.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 
-                uploadBtn.textContent = 'Uploading...';
-                uploadBtn.disabled = true;
+                uploadBtnFront.textContent = 'Uploading...';
+                uploadBtnFront.disabled = true;
                 
                 uploadFile(file, file.name)
                     .then(res => {
                         if (res.success) {
                             cert.file = res.url;
                             renderCertifications();
-                            showToast('Certificate document uploaded successfully.', 'success');
+                            showToast('Certificate front side uploaded successfully.', 'success');
                         } else {
                             throw new Error('Upload unsuccessful');
                         }
                     })
                     .catch(err => {
                         console.error(err);
-                        uploadBtn.textContent = 'Upload Failed';
-                        uploadBtn.disabled = false;
-                        showToast('Failed to upload certification proof.', 'error');
+                        uploadBtnFront.textContent = 'Upload Failed';
+                        uploadBtnFront.disabled = false;
+                        showToast('Failed to upload front side.', 'error');
+                    });
+            });
+
+            // File Upload Listener - Back
+            const fileInputBack = card.querySelector('.cert-back-input');
+            const uploadBtnBack = card.querySelector('.btn-back');
+            fileInputBack.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                uploadBtnBack.textContent = 'Uploading...';
+                uploadBtnBack.disabled = true;
+                
+                uploadFile(file, file.name)
+                    .then(res => {
+                        if (res.success) {
+                            cert.file2 = res.url;
+                            renderCertifications();
+                            showToast('Certificate back side uploaded successfully.', 'success');
+                        } else {
+                            throw new Error('Upload unsuccessful');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        uploadBtnBack.textContent = 'Upload Failed';
+                        uploadBtnBack.disabled = false;
+                        showToast('Failed to upload back side.', 'error');
                     });
             });
             

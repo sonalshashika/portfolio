@@ -903,6 +903,58 @@ const init = () => {
             });
         });
     }
+
+    // --- Certificate Modal Showcase ---
+    const certModal = document.getElementById('cert-modal');
+    if (certModal) {
+        const modalBackdrop = certModal.querySelector('.cert-modal-backdrop');
+        const modalClose = certModal.querySelector('.cert-modal-close');
+        const viewerCard = certModal.querySelector('.cert-viewer-card');
+        const imgFront = certModal.querySelector('.cert-viewer-front img');
+        const imgBack = certModal.querySelector('.cert-viewer-back img');
+        const flipBtn = document.getElementById('cert-flip-btn');
+
+        const closeModal = () => {
+            certModal.classList.remove('active');
+            viewerCard.classList.remove('flipped');
+            // Allow Lenis smooth scroll again
+            if (typeof lenis !== 'undefined' && lenis.start) lenis.start();
+        };
+
+        modalBackdrop.addEventListener('click', closeModal);
+        modalClose.addEventListener('click', closeModal);
+
+        // Delegation for view certificate buttons
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.view-cert-btn');
+            if (!btn) return;
+            
+            e.preventDefault();
+            const frontSrc = btn.getAttribute('data-front');
+            const backSrc = btn.getAttribute('data-back');
+
+            imgFront.src = frontSrc;
+            if (backSrc) {
+                imgBack.src = backSrc;
+                flipBtn.style.display = 'inline-block';
+            } else {
+                imgBack.src = '';
+                flipBtn.style.display = 'none';
+            }
+
+            viewerCard.classList.remove('flipped');
+            certModal.classList.add('active');
+
+            // Pause Lenis smooth scroll while viewing certificate
+            if (typeof lenis !== 'undefined' && lenis.stop) lenis.stop();
+        });
+
+        if (flipBtn) {
+            flipBtn.addEventListener('click', () => {
+                viewerCard.classList.toggle('flipped');
+            });
+        }
+    }
 };
 
 let globalCertsData = [];
@@ -1074,10 +1126,10 @@ if (document.readyState === 'loading') {
                         savedData.certsData.forEach(cert => {
                             let fileHtml = cert.file ? `
                             <div class="project-links">
-                                <a href="${cert.file}" target="_blank" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-                                    View Document
-                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px; display: inline-block; vertical-align: middle;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                                </a>
+                                <button class="btn btn-secondary view-cert-btn" data-front="${cert.file}" data-back="${cert.file2 || ''}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                    View Certificate
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 6px; display: inline-block; vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                </button>
                             </div>
                             ` : '';
                             

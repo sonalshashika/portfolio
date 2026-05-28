@@ -426,6 +426,29 @@
         </defs>
     </svg>
 
+    <!-- Certificate Showcase Modal -->
+    <div id="cert-modal" class="cert-modal">
+        <div class="cert-modal-backdrop"></div>
+        <div class="cert-modal-content">
+            <button class="cert-modal-close" aria-label="Close modal">&times;</button>
+            <div class="cert-viewer-container">
+                <div class="cert-viewer-card">
+                    <div class="cert-viewer-face cert-viewer-front">
+                        <div class="cert-shield"></div>
+                        <img src="" alt="Certificate Front" class="cert-img" oncontextmenu="return false;" ondragstart="return false;">
+                    </div>
+                    <div class="cert-viewer-face cert-viewer-back">
+                        <div class="cert-shield"></div>
+                        <img src="" alt="Certificate Back" class="cert-img" oncontextmenu="return false;" ondragstart="return false;">
+                    </div>
+                </div>
+            </div>
+            <div class="cert-modal-controls">
+                <button id="cert-flip-btn" class="btn btn-primary">Flip Certificate</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
