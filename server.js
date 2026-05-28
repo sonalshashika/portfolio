@@ -17,11 +17,16 @@ if (fs.existsSync(ENV_FILE)) {
             envVars[match[1]] = match[2];
         }
     });
-} else {
+} else if (!process.env.VERCEL) {
     const randomPass = crypto.randomBytes(8).toString('hex');
-    fs.writeFileSync(ENV_FILE, `ADMIN_USER=admin\nADMIN_PASS=${randomPass}\n`);
-    envVars['ADMIN_USER'] = 'admin';
-    envVars['ADMIN_PASS'] = randomPass;
+    try {
+        fs.writeFileSync(ENV_FILE, `ADMIN_USER=admin\nADMIN_PASS=${randomPass}\n`);
+        envVars['ADMIN_USER'] = 'admin';
+        envVars['ADMIN_PASS'] = randomPass;
+    } catch (e) {
+        console.error('Failed to write .env file:', e.message);
+    }
+}
     console.log(`\n=========================================`);
     console.log(`Generated new admin credentials in .env file:`);
     console.log(`Username: admin`);
