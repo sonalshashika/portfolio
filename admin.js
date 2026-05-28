@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 // Fallback for static GitHub Pages Mode (Validate via GitHub Token)
-                if (err.message.includes('fetch') || err.message.includes('not found') || err.message.includes('Failed to fetch') || err.message.includes('variable')) {
+                if (err.message.includes('fetch') || err.message.includes('not found') || err.message.includes('Failed to fetch') || err.message.includes('variable') || err.message.includes('405') || err.message.includes('404')) {
                     try {
                         const owner = 'sonalshashika';
                         const repo = 'portfolio';
