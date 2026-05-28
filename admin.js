@@ -887,7 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Settings & Credentials Form ---
     const settingsForm = document.getElementById('settingsForm');
     if (settingsForm) {
-        settingsForm.addEventListener('submit', (e) => {
+        settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('adminUsernameInput').value.trim();
             const password = document.getElementById('adminPasswordInput').value;
@@ -910,32 +910,48 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBtn.textContent = 'Updating...';
             updateBtn.disabled = true;
 
-            fetch('/api/settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            })
-            .then(res => {
+            try {
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const contentType = res.headers.get('content-type') || '';
+
+                // If the response is HTML, the API endpoint doesn't exist (GitHub Pages / static host)
+                if (!contentType.includes('application/json')) {
+                    // Check if we're in GitHub Pages mode
+                    const ghSettings = getGhSettings();
+                    if (ghSettings.token) {
+                        showToast('On GitHub Pages, your login uses a GitHub Personal Access Token. To change it, go to GitHub → Settings → Developer settings → Personal access tokens, then update the token in the GitHub Integration section below.', 'info');
+                    } else {
+                        showToast('Password change is not available on static hosting (GitHub Pages). Deploy on Vercel or run the server locally to use this feature.', 'error');
+                    }
+                    return;
+                }
+
                 if (res.ok) {
                     showToast('Credentials updated successfully. Please note down your new credentials!', 'success');
                     document.getElementById('adminPasswordInput').value = '';
                     document.getElementById('adminPasswordConfirmInput').value = '';
                 } else {
-                    return res.json().then(data => {
-                        throw new Error(data.error || 'Failed to update credentials');
-                    });
+                    const data = await res.json();
+                    throw new Error(data.error || 'Failed to update credentials');
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                showToast(err.message || 'Error updating credentials.', 'error');
-            })
-            .finally(() => {
+            } catch (err) {
+                // Network error or fetch failure — also likely static hosting
+                if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                    showToast('Password change is not available on static hosting. Use Vercel or run the server locally.', 'error');
+                } else if (!err.message.includes('GitHub Pages') && !err.message.includes('static hosting') && !err.message.includes('Personal Access Token')) {
+                    showToast(err.message || 'Error updating credentials.', 'error');
+                }
+            } finally {
                 updateBtn.textContent = 'Update Credentials';
                 updateBtn.disabled = false;
-            });
+            }
         });
     }
 
