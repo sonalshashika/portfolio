@@ -1187,7 +1187,7 @@ if (document.readyState === 'loading') {
                         projectsContainer.innerHTML = '';
                         savedData.projectsData.forEach((proj, idx) => {
                             let tags = proj.tags.map(t => `<span>${t}</span>`).join('');
-                            let bentoClass = idx === 0 ? 'bento-large' : 'bento-small';
+                            let bentoClass = 'bento-small';
                             let html = `
                             <div class="project-card ${bentoClass}" data-category="${proj.category || 'project'}">
                                 <div class="project-content">
