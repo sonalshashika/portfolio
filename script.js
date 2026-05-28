@@ -153,9 +153,8 @@ const init = () => {
     function initHeroAnimations() {
         const tl = gsap.timeline();
         tl.from('.badge', { y: -20, opacity: 0, duration: 0.8 })
-            .to('.hero-content h1', { duration: 0.1, onComplete: () => decryptText(document.querySelector('.hero-content h1')) })
-            .to('.tagline', { duration: 0.1, onComplete: () => decryptText(document.querySelector('.tagline')) }, "+=0.2")
-            .from('.tagline', { y: 20, opacity: 0, duration: 0.8 }, "<")
+            .from('.hero-content h1', { y: 20, opacity: 0, duration: 0.8 }, "-=0.4")
+            .from('.tagline', { y: 20, opacity: 0, duration: 0.8 }, "-=0.6")
             .from('.hero-actions', { y: 20, opacity: 0, duration: 0.8 }, "-=0.6")
             .from('.image-wrapper', { scale: 0.9, opacity: 0, duration: 1.2, ease: "expo.out" }, "-=1");
     }
