@@ -571,6 +571,37 @@ const init = () => {
 
     if (terminalInput && terminalOutput) {
         const commandHistory = [];
+        let isAiActive = false;
+        const promptLabel = document.querySelector('.terminal-input-line .prompt');
+
+        function getOfflineAiResponse(query) {
+            const q = query.toLowerCase();
+            let matched = [];
+            
+            if (q.includes('firewall') || q.includes('fortigate') || q.includes('mikrotik') || q.includes('network') || q.includes('vlan')) {
+                matched.push("Sonal is highly skilled in Network Engineering & Security, managing FortiGate firewalls, Mikrotik routers, and enterprise switch topologies.");
+            }
+            if (q.includes('vmware') || q.includes('hyper-v') || q.includes('virtualization') || q.includes('server')) {
+                matched.push("He has extensive experience administering VMware ESXi clusters, Hyper-V virtual environments, and Active Directory system policies.");
+            }
+            if (q.includes('c#') || q.includes('python') || q.includes('development') || q.includes('javascript') || q.includes('coding') || q.includes('program')) {
+                matched.push("Sonal develops custom software and scripts in C#, Python, PowerShell, and JavaScript, specializing in automation frameworks.");
+            }
+            if (q.includes('experience') || q.includes('years') || q.includes('job') || q.includes('history') || q.includes('work')) {
+                matched.push("Sonal has over 11+ years of professional IT industry experience, currently serving as an IT Executive at AAT Sri Lanka.");
+            }
+            if (q.includes('certification') || q.includes('cert') || q.includes('certs') || q.includes('education') || q.includes('credentials')) {
+                matched.push("Sonal holds multiple credentials, including a Vocational Training Authority (VTA) IT Support credential, LITS networking qualifications, and CompTIA A+ equivalents.");
+            }
+            if (q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('hire')) {
+                matched.push("You can reach Sonal directly via email at sonalshashika@gmail.com, or check out his LinkedIn under the link in the footer.");
+            }
+
+            if (matched.length > 0) {
+                return matched.join(" ");
+            }
+            return "I recognize your query, but I don't have a specific database entry about that. Feel free to contact Sonal at sonalshashika@gmail.com for more details!";
+        }
 
         function appendLine(html) {
             const div = document.createElement('div');
@@ -599,6 +630,43 @@ const init = () => {
             if (!input) return;
             commandHistory.push(input);
 
+            if (isAiActive) {
+                if (input === 'exit') {
+                    isAiActive = false;
+                    if (promptLabel) promptLabel.innerHTML = 'sonal@jayawardana:~$';
+                    printLine(raw, 'Exiting AI terminal session. Type <span style="color:#00ffff">help</span> for commands.');
+                    return;
+                }
+                
+                appendLine(`<span class="prompt">ai&gt; ${DOMPurify.sanitize(raw)}</span>`);
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'terminal-line';
+                responseDiv.innerHTML = '<span class="output">AI is thinking... ⏳</span>';
+                terminalOutput.appendChild(responseDiv);
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: raw })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Network error');
+                    return res.json();
+                })
+                .then(data => {
+                    responseDiv.innerHTML = `<span class="output" style="color: #a78bfa;">${DOMPurify.sanitize(data.response)}</span>`;
+                    terminalBody.scrollTop = terminalBody.scrollHeight;
+                })
+                .catch(() => {
+                    const localRes = getOfflineAiResponse(raw);
+                    responseDiv.innerHTML = `<span class="output" style="color: #a78bfa;">${DOMPurify.sanitize(localRes)}</span>`;
+                    terminalBody.scrollTop = terminalBody.scrollHeight;
+                });
+
+                return;
+            }
+
             // ── INFO COMMANDS ───────────────────────────────────
             if (input === 'help') {
                 printAsync('help', [
@@ -607,6 +675,7 @@ const init = () => {
                     '│             projects · certs · contact · linkedin        │',
                     '│  SYSTEM     date · sysinfo · ping · history              │',
                     '│  FUN        matrix · hack · sudo                         │',
+                    '│  AI         ai                                           │',
                     '│  NAVIGATE   goto home · goto projects · goto contact     │',
                     '│  UTIL       clear                                        │',
                     '└─────────────────────────────────────────────────────────┘',
@@ -759,6 +828,17 @@ const init = () => {
                     'Sorry, 3 incorrect password attempts and counting.',
                     'Access Denied. Nice try. 🔒',
                 ], 500);
+
+            } else if (input === 'ai') {
+                isAiActive = true;
+                if (promptLabel) promptLabel.innerHTML = 'ai@nexus:~$';
+                printAsync(input, [
+                    '┌─── NEXUS AI REC-COORDINATOR CONNECTED ─────────────────┐',
+                    '│ Ask me anything about Sonal\'s background, skills,      │',
+                    '│ or qualifications. Type \'exit\' to return to console.    │',
+                    '└────────────────────────────────────────────────────────┘',
+                ], 30);
+                return;
 
                 // ── NAVIGATE COMMANDS ─────────────────────────────────
             } else if (input.startsWith('goto ')) {

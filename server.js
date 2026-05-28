@@ -92,6 +92,45 @@ function callGeminiAPI(apiKey, prompt, base64Image, mimeType) {
     });
 }
 
+function callGeminiTextAPI(apiKey, prompt) {
+    return new Promise((resolve, reject) => {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const requestBody = JSON.stringify({
+            contents: [{
+                parts: [
+                    { text: prompt }
+                ]
+            }]
+        });
+
+        const req = https.request(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(requestBody)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error(`Failed to parse Gemini response: ${data}`));
+                    }
+                } else {
+                    reject(new Error(`Gemini API Error: Status ${res.statusCode} - ${data}`));
+                }
+            });
+        });
+
+        req.on('error', err => reject(err));
+        req.write(requestBody);
+        req.end();
+    });
+}
+
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
@@ -302,6 +341,61 @@ const server = http.createServer((req, res) => {
                 console.error(e);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: e.message || 'Error occurred analyzing certificate' }));
+            }
+        });
+        return;
+    }
+
+    if (normalizedPath === '/api/chat' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const payload = JSON.parse(body);
+                const { message } = payload;
+                if (!message) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing message' }));
+                    return;
+                }
+
+                const apiKey = process.env.GEMINI_API_KEY || envVars.GEMINI_API_KEY;
+                if (!apiKey) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ response: "I'd love to chat, but Sonal's Gemini API Key is not configured on this server yet. Ask him to set it up in the admin Settings panel!" }));
+                    return;
+                }
+
+                let portfolioData = {};
+                if (fs.existsSync(DATA_FILE)) {
+                    try {
+                        portfolioData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+                    } catch(e){}
+                }
+
+                const systemPrompt = `You are "Nexus AI Core", Sonal Jayawardana's digital clone & recruiter agent. Answer questions about Sonal's skills, qualifications, work history, projects, and certificates.
+
+Sonal's Portfolio Data Context:
+${JSON.stringify(portfolioData, null, 2)}
+
+Rules:
+1. Speak in the third person or as Sonal's advanced AI companion. Keep the tone professional and friendly.
+2. Answer based ONLY on Sonal's dataset above. If the dataset does not contain the answer, state that you don't have that specific record, but suggest contacting Sonal directly at sonalshashika@gmail.com.
+3. Keep answers concise: 1 to 3 sentences maximum. Use standard plaintext, no markdown tables, keep it compact since it is viewed in a raw retro terminal window.`;
+
+                const response = await callGeminiTextAPI(apiKey, `${systemPrompt}\n\nUser Question: ${message}`);
+                
+                let textResult = '';
+                if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts[0]) {
+                    textResult = response.candidates[0].content.parts[0].text;
+                }
+                
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ response: textResult.trim() }));
+            } catch (e) {
+                console.error(e);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message || 'Error occurred during AI chat' }));
             }
         });
         return;

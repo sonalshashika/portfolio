@@ -10,7 +10,7 @@
   "stat1Label": "Years Tech Experience",
   "stat2Value": "100%",
   "stat2Label": "System Reliability",
-  "stat3Value": "3+",
+  "stat3Value": "8",
   "stat3Label": "Certifications",
   "experienceData": [
     {
@@ -72,11 +72,47 @@
   ],
   "certsData": [
     {
-      "title": "Vocational Training Authority (VTA) – IT Support",
-      "issuer": "VTA",
-      "date": "2018",
-      "file": "images/certificates/1779941752114_dara_page-0001.jpg",
-      "file2": "images/certificates/1779942292630_dara_page-0002.jpg"
+      "title": "National Certificate - Computer Hardware Technician (NVQ Level 4)",
+      "issuer": "Vocational Training Authority of Sri Lanka",
+      "date": "2014",
+      "file": "images/certificates/1779943473776_dara_page-0001.jpg",
+      "file2": "images/certificates/1779943479027_dara_page-0002.jpg"
+    },
+    {
+      "title": "Cybersecurity Essentials",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943379338_dara_page-0009.jpg"
+    },
+    {
+      "title": "Introduction to Cybersecurity",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943359154_dara_page-0008.jpg"
+    },
+    {
+      "title": "IoT Fundamentals: Connecting Things",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943338634_dara_page-0007.jpg"
+    },
+    {
+      "title": "Mobility Fundamentals",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943310549_dara_page-0006.jpg"
+    },
+    {
+      "title": "Introduction to Packet Tracer",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943288920_dara_page-0005.jpg"
+    },
+    {
+      "title": "Introduction to IoT",
+      "issuer": "Cisco Networking Academy",
+      "date": "2019",
+      "file": "images/certificates/1779943266579_dara_page-0004.jpg"
     },
     {
       "title": "CompTIA A+ Equivalent",
