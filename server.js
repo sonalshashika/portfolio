@@ -23,15 +23,14 @@ if (fs.existsSync(ENV_FILE)) {
         fs.writeFileSync(ENV_FILE, `ADMIN_USER=admin\nADMIN_PASS=${randomPass}\n`);
         envVars['ADMIN_USER'] = 'admin';
         envVars['ADMIN_PASS'] = randomPass;
+        console.log(`\n=========================================`);
+        console.log(`Generated new admin credentials in .env file:`);
+        console.log(`Username: admin`);
+        console.log(`Password: ${randomPass}`);
+        console.log(`=========================================\n`);
     } catch (e) {
         console.error('Failed to write .env file:', e.message);
     }
-}
-    console.log(`\n=========================================`);
-    console.log(`Generated new admin credentials in .env file:`);
-    console.log(`Username: admin`);
-    console.log(`Password: ${randomPass}`);
-    console.log(`=========================================\n`);
 }
 
 let ADMIN_USER = process.env.ADMIN_USER || envVars.ADMIN_USER || 'admin';
