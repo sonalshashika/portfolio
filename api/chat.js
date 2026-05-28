@@ -60,12 +60,11 @@ module.exports = async (req, res) => {
             return;
         }
 
-        const DATA_FILE = path.join(process.cwd(), 'data.json');
         let portfolioData = {};
-        if (fs.existsSync(DATA_FILE)) {
-            try {
-                portfolioData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-            } catch(e){}
+        try {
+            portfolioData = require('../data.json');
+        } catch(e){
+            console.error('Failed to load data.json:', e);
         }
 
         const systemPrompt = `You are "Nexus AI Core", Sonal Jayawardana's digital clone & recruiter agent. Answer questions about Sonal's skills, qualifications, work history, projects, and certificates.
