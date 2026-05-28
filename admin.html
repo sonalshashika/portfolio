@@ -315,6 +315,37 @@
                         </div>
                     </div>
 
+                    <!-- AI Assistant Settings -->
+                    <div class="card panel-card" style="margin-bottom: 2rem;">
+                        <div class="card-header">
+                            <h2>AI Assistant Settings</h2>
+                            <p>Configure Gemini API Key to enable automated certificate identification and metadata autofill.</p>
+                        </div>
+                        <div class="card-body">
+                            <form id="aiSettingsForm">
+                                <div class="form-group">
+                                    <label for="geminiApiKeyInput">
+                                        Gemini API Key
+                                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="label-link">
+                                            Get API key →
+                                        </a>
+                                    </label>
+                                    <div class="token-input-wrapper">
+                                        <input type="password" id="geminiApiKeyInput" placeholder="AIzaSyxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+                                        <button type="button" id="toggleGeminiKeyVisibility" class="btn-icon" title="Show/hide key">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        </button>
+                                    </div>
+                                    <span class="field-hint">Stored securely on the server's <code>.env</code> file (or local browser cache in static mode).</span>
+                                </div>
+                                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                                    <button type="submit" class="btn primary" id="saveAiSettingsBtn">Save AI Settings</button>
+                                    <button type="button" class="btn secondary danger-hover" id="clearAiSettingsBtn">Clear Key</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- GitHub Integration Settings -->
                     <div class="card panel-card">
                         <div class="card-header">

@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -41,6 +42,56 @@ function checkAuth(req) {
     return username === ADMIN_USER && password === ADMIN_PASS;
 }
 
+function callGeminiAPI(apiKey, prompt, base64Image, mimeType) {
+    return new Promise((resolve, reject) => {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const cleanBase64 = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+        const requestBody = JSON.stringify({
+            contents: [{
+                parts: [
+                    { text: prompt },
+                    {
+                        inlineData: {
+                            mimeType: mimeType || 'image/jpeg',
+                            data: cleanBase64
+                        }
+                    }
+                ]
+            }],
+            generationConfig: {
+                responseMimeType: "application/json"
+            }
+        });
+
+        const req = https.request(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(requestBody)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error(`Failed to parse Gemini response: ${data}`));
+                    }
+                } else {
+                    reject(new Error(`Gemini API Error: Status ${res.statusCode} - ${data}`));
+                }
+            });
+        });
+
+        req.on('error', err => reject(err));
+        req.write(requestBody);
+        req.end();
+    });
+}
+
 const MIME_TYPES = {
     '.html': 'text/html',
     '.css': 'text/css',
@@ -53,9 +104,17 @@ const server = http.createServer((req, res) => {
     safeUrl = safeUrl.split('?')[0];
     const normalizedPath = path.normalize(safeUrl).replace(/^(\.\.[\/\\])+/, '').replace(/\\/g, '/');
 
-    const isAdminRoute = normalizedPath.startsWith('/admin');
-    const isPostApi = (normalizedPath === '/api/content' || normalizedPath === '/api/upload' || normalizedPath === '/api/settings') && req.method === 'POST';
-    if (isAdminRoute || isPostApi) {
+    const isPostApi = (
+        normalizedPath === '/api/content' || 
+        normalizedPath === '/api/upload' || 
+        normalizedPath === '/api/settings' || 
+        normalizedPath === '/api/settings/ai' || 
+        normalizedPath === '/api/analyze-certificate'
+    ) && req.method === 'POST';
+    
+    const isGetSettings = normalizedPath === '/api/settings/ai' && req.method === 'GET';
+    
+    if (isAdminRoute || isPostApi || isGetSettings) {
         if (!checkAuth(req)) {
             res.writeHead(401, {
                 'WWW-Authenticate': 'Basic realm="Control Panel"',
@@ -155,6 +214,93 @@ const server = http.createServer((req, res) => {
             } catch (e) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Invalid JSON data' }));
+            }
+        });
+        return;
+    }
+
+    if (normalizedPath === '/api/settings/ai') {
+        if (req.method === 'GET') {
+            const key = process.env.GEMINI_API_KEY || envVars.GEMINI_API_KEY || '';
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ hasKey: !!key }));
+            return;
+        }
+        if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => body += chunk.toString());
+            req.on('end', () => {
+                try {
+                    const payload = JSON.parse(body);
+                    const { geminiApiKey } = payload;
+                    
+                    let envContent = '';
+                    if (fs.existsSync(ENV_FILE)) {
+                        envContent = fs.readFileSync(ENV_FILE, 'utf8');
+                    }
+                    
+                    if (envContent.includes('GEMINI_API_KEY=')) {
+                        envContent = envContent.replace(/GEMINI_API_KEY=.*/, `GEMINI_API_KEY=${geminiApiKey}`);
+                    } else {
+                        envContent += `\nGEMINI_API_KEY=${geminiApiKey}\n`;
+                    }
+                    
+                    fs.writeFileSync(ENV_FILE, envContent, 'utf8');
+                    envVars.GEMINI_API_KEY = geminiApiKey;
+                    process.env.GEMINI_API_KEY = geminiApiKey;
+
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: true }));
+                } catch (e) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid payload' }));
+                }
+            });
+            return;
+        }
+    }
+
+    if (normalizedPath === '/api/analyze-certificate' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', async () => {
+            try {
+                const payload = JSON.parse(body);
+                const { base64, mimeType } = payload;
+                if (!base64) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing base64 data' }));
+                    return;
+                }
+
+                const apiKey = process.env.GEMINI_API_KEY || envVars.GEMINI_API_KEY;
+                if (!apiKey) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Gemini API key is not configured on the server' }));
+                    return;
+                }
+
+                const prompt = "Analyze this certificate image. Identify the certificate title (name of course/certification), issuer (issuing organization), and the year of completion. Return a JSON object with fields: 'title' (string, max 60 chars), 'issuer' (string, max 40 chars), 'date' (string, 4-digit year).";
+                
+                const response = await callGeminiAPI(apiKey, prompt, base64, mimeType);
+                
+                let textResult = '';
+                if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts[0]) {
+                    textResult = response.candidates[0].content.parts[0].text;
+                }
+                
+                try {
+                    const parsedData = JSON.parse(textResult.trim());
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(parsedData));
+                } catch (e) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Failed to parse Gemini response as JSON', response: textResult }));
+                }
+            } catch (e) {
+                console.error(e);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message || 'Error occurred analyzing certificate' }));
             }
         });
         return;

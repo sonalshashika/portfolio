@@ -558,6 +558,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             cert.file = res.url;
                             renderCertifications();
                             showToast('Certificate front side uploaded successfully.', 'success');
+                            
+                            // Automatically trigger AI auto-identification
+                            const allCards = list.querySelectorAll('.editor-card');
+                            const targetCard = allCards[idx];
+                            if (targetCard) {
+                                analyzeCertificateFile(file, targetCard, cert);
+                            }
                         } else {
                             throw new Error('Upload unsuccessful');
                         }
@@ -1041,5 +1048,206 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load GitHub settings into UI on startup
     loadGhSettingsUI();
+
+    // ─── Gemini API / AI Assistant Settings ──────────────────────────────
+    async function analyzeCertificateFile(file, cardEl, certObj) {
+        const titleInput  = cardEl.querySelector('.cert-title');
+        const issuerInput = cardEl.querySelector('.cert-issuer');
+        const dateInput   = cardEl.querySelector('.cert-date');
+
+        const originalTitle = titleInput.value;
+        titleInput.value = 'AI Analyzing... ⏳';
+        titleInput.disabled = true;
+        issuerInput.disabled = true;
+        dateInput.disabled = true;
+
+        try {
+            const reader = new FileReader();
+            const base64Promise = new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+            });
+            reader.readAsDataURL(file);
+            const base64Data = await base64Promise;
+
+            let result = null;
+
+            if (isServerAvailable) {
+                // Server mode
+                const res = await fetch('/api/analyze-certificate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ base64: base64Data, mimeType: file.type })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Server analysis failed');
+                }
+                result = await res.json();
+            } else {
+                // Static GitHub Pages mode (Direct API call from browser)
+                const apiKey = localStorage.getItem('portfolio_gemini_key');
+                if (!apiKey) {
+                    throw new Error('Gemini API Key is not configured. Setup key in Settings first.');
+                }
+                
+                const cleanBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const body = {
+                    contents: [{
+                        parts: [
+                            { text: "Analyze this certificate image. Identify the certificate title (name of course/certification), issuer (issuing organization), and the year of completion. Return a JSON object with fields: 'title' (string, max 60 chars), 'issuer' (string, max 40 chars), 'date' (string, 4-digit year)." },
+                            {
+                                inlineData: {
+                                    mimeType: file.type || 'image/jpeg',
+                                    data: cleanBase64
+                                }
+                            }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                };
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) {
+                    throw new Error('Gemini API direct call failed. Verify your API key.');
+                }
+                const data = await res.json();
+                
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+                    const textResult = data.candidates[0].content.parts[0].text;
+                    result = JSON.parse(textResult.trim());
+                } else {
+                    throw new Error('Invalid response format from Gemini API');
+                }
+            }
+
+            if (result && (result.title || result.issuer || result.date)) {
+                if (result.title) {
+                    certObj.title = result.title;
+                    titleInput.value = result.title;
+                }
+                if (result.issuer) {
+                    certObj.issuer = result.issuer;
+                    issuerInput.value = result.issuer;
+                }
+                if (result.date) {
+                    certObj.date = result.date;
+                    dateInput.value = result.date;
+                }
+                showToast('✨ AI Autofill complete! Certificate identified successfully.', 'success');
+            } else {
+                throw new Error('No structured information returned');
+            }
+        } catch (err) {
+            console.error('Autofill error:', err);
+            titleInput.value = originalTitle;
+            showToast(`AI Autofill failed: ${err.message}`, 'error');
+        } finally {
+            titleInput.disabled = false;
+            issuerInput.disabled = false;
+            dateInput.disabled = false;
+        }
+    }
+
+    // AI Form wiring
+    const aiForm = document.getElementById('aiSettingsForm');
+    if (aiForm) {
+        const localKeyKey = 'portfolio_gemini_key';
+        
+        const loadAiSettings = async () => {
+            if (isServerAvailable) {
+                try {
+                    const res = await fetch('/api/settings/ai');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.hasKey) {
+                            document.getElementById('geminiApiKeyInput').value = '••••••••••••••••••••';
+                        }
+                    }
+                } catch (e) {}
+            } else {
+                const key = localStorage.getItem(localKeyKey);
+                if (key) {
+                    document.getElementById('geminiApiKeyInput').value = key;
+                }
+            }
+        };
+
+        // Call load
+        setTimeout(loadAiSettings, 1000);
+
+        aiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const keyVal = document.getElementById('geminiApiKeyInput').value.trim();
+
+            if (!keyVal) {
+                showToast('API Key cannot be empty.', 'error');
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveAiSettingsBtn');
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+
+            try {
+                if (isServerAvailable) {
+                    const res = await fetch('/api/settings/ai', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ geminiApiKey: keyVal })
+                    });
+                    if (!res.ok) throw new Error('Failed to save on server');
+                    showToast('AI Settings updated successfully on server.', 'success');
+                } else {
+                    localStorage.setItem(localKeyKey, keyVal);
+                    showToast('AI Settings saved to browser localStorage.', 'success');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                saveBtn.textContent = 'Save AI Settings';
+                saveBtn.disabled = false;
+            }
+        });
+
+        const clearBtn = document.getElementById('clearAiSettingsBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', async () => {
+                document.getElementById('geminiApiKeyInput').value = '';
+                if (isServerAvailable) {
+                    try {
+                        await fetch('/api/settings/ai', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ geminiApiKey: '' })
+                        });
+                    } catch(e){}
+                } else {
+                    localStorage.removeItem(localKeyKey);
+                }
+                showToast('AI API Key cleared.', 'info');
+            });
+        }
+
+        const toggleBtn = document.getElementById('toggleGeminiKeyVisibility');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const inp = document.getElementById('geminiApiKeyInput');
+                if (inp.type === 'password') {
+                    inp.type = 'text';
+                    toggleBtn.title = 'Hide key';
+                } else {
+                    inp.type = 'password';
+                    toggleBtn.title = 'Show key';
+                }
+            });
+        }
+    }
 });
 
