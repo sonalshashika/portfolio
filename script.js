@@ -150,13 +150,36 @@ const init = () => {
         .to('.loader-text', { text: "SYSTEMS ONLINE", duration: 0.5 });
 
 
+    function typewriterText(element, duration = 1.5, onComplete = null) {
+        if (!element) return;
+        const originalHTML = element.innerHTML;
+        const textContent = element.textContent;
+        element.style.opacity = 1;
+        element.innerHTML = '';
+        
+        const textObj = { val: 0 };
+        gsap.to(textObj, {
+            duration: duration,
+            val: textContent.length,
+            ease: "none",
+            onUpdate: () => {
+                const typed = textContent.substring(0, Math.ceil(textObj.val));
+                element.textContent = typed + '_';
+            },
+            onComplete: () => {
+                element.innerHTML = originalHTML;
+                if (onComplete) onComplete();
+            }
+        });
+    }
+
     function initHeroAnimations() {
         const tl = gsap.timeline();
         tl.from('.badge', { y: -20, opacity: 0, duration: 0.8 })
-            .from('.hero-content h1', { y: 20, opacity: 0, duration: 0.8 }, "-=0.4")
-            .from('.tagline', { y: 20, opacity: 0, duration: 0.8 }, "-=0.6")
-            .from('.hero-actions', { y: 20, opacity: 0, duration: 0.8 }, "-=0.6")
-            .from('.image-wrapper', { scale: 0.9, opacity: 0, duration: 1.2, ease: "expo.out" }, "-=1");
+            .to('.hero-content h1', { duration: 0.1, onComplete: () => typewriterText(document.querySelector('.hero-content h1'), 1.2) })
+            .to('.tagline', { duration: 0.1, onComplete: () => typewriterText(document.querySelector('.tagline'), 1.5) }, "+=0.3")
+            .from('.hero-actions', { y: 20, opacity: 0, duration: 0.8 }, "+=0.5")
+            .from('.image-wrapper', { scale: 0.9, opacity: 0, duration: 1.2, ease: "expo.out" }, "-=1.2");
     }
 
     // --- Living Portrait Interaction (Static) ---
