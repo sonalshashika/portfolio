@@ -11,7 +11,32 @@
     <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-theme">
-    <div class="dashboard-wrapper">
+    <!-- Secure Cyber Login Panel -->
+    <div id="login-modal" class="cyber-login-wrapper">
+        <div class="cyber-login-card">
+            <div class="login-brand">
+                <h2>Sonal<span>.</span><span class="subbrand">CMS</span></h2>
+            </div>
+            <div class="login-header">
+                <h3>SECURE NODE ACCESS</h3>
+                <p>Enter administrative credentials to open control console.</p>
+            </div>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>ADMIN SECURITY ID</label>
+                    <input type="text" id="loginUsername" placeholder="e.g. admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>DECRYPTION KEY</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" id="loginSubmitBtn" class="btn primary w-100" style="padding: 12px; font-weight: 600; letter-spacing: 1px;">INITIALIZE ACCESS</button>
+                <div id="loginError" class="login-error-text"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper" style="display: none;">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-brand">

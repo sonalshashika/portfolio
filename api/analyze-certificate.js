@@ -50,9 +50,26 @@ function callGeminiAPI(apiKey, prompt, base64Image, mimeType) {
     });
 }
 
+function checkAuth(req) {
+    const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+    const ADMIN_PASS = process.env.ADMIN_PASS;
+    if (!ADMIN_PASS) return true; // Default to allow if not configured
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return false;
+    const [type, credentials] = authHeader.split(' ');
+    if (type !== 'Basic') return false;
+    const [username, password] = Buffer.from(credentials, 'base64').toString().split(':');
+    return username === ADMIN_USER && password === ADMIN_PASS;
+}
+
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method Not Allowed' });
+        return;
+    }
+
+    if (!checkAuth(req)) {
+        res.status(401).json({ error: 'Unauthorized secure access' });
         return;
     }
 

@@ -1,5 +1,89 @@
 document.addEventListener('DOMContentLoaded', () => {
     let appState = {};
+
+    // ─── Secure Admin Login Guard ────────────────────────────────────
+    const loginModal = document.getElementById('login-modal');
+    const dashboardWrapper = document.querySelector('.dashboard-wrapper');
+    const loginForm = document.getElementById('adminLoginForm');
+    const loginError = document.getElementById('loginError');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
+    function checkPageAccess() {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isAuthed = sessionStorage.getItem('admin_authenticated') === 'true';
+
+        if (isLocalhost || isAuthed) {
+            if (loginModal) loginModal.style.display = 'none';
+            if (dashboardWrapper) dashboardWrapper.style.display = 'flex';
+        } else {
+            if (loginModal) loginModal.style.display = 'flex';
+            if (dashboardWrapper) dashboardWrapper.style.display = 'none';
+        }
+    }
+
+    // Initialize access check
+    checkPageAccess();
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            loginSubmitBtn.disabled = true;
+            loginSubmitBtn.textContent = 'AUTHENTICATING...';
+            loginError.textContent = '';
+
+            try {
+                // Try Vercel Serverless Authentication API
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (res.ok) {
+                    sessionStorage.setItem('admin_authenticated', 'true');
+                    sessionStorage.setItem('admin_auth_creds', btoa(username + ':' + password));
+                    showToast('Access granted.', 'success');
+                    checkPageAccess();
+                } else {
+                    const data = await res.json();
+                    throw new Error(data.error || 'Invalid credentials');
+                }
+            } catch (err) {
+                // Fallback for static GitHub Pages Mode (Validate via GitHub Token)
+                if (err.message.includes('fetch') || err.message.includes('not found') || err.message.includes('Failed to fetch') || err.message.includes('variable')) {
+                    try {
+                        const owner = 'sonalshashika';
+                        const repo = 'portfolio';
+                        const checkRes = await fetch(
+                            `https://api.github.com/repos/${owner}/${repo}/contents/data.json`,
+                            {
+                                headers: {
+                                    'Authorization': `Bearer ${password}`,
+                                    'Accept': 'application/vnd.github+json'
+                                }
+                            }
+                        );
+                        if (checkRes.ok) {
+                            sessionStorage.setItem('admin_authenticated', 'true');
+                            saveGhSettings({ owner, repo, token: password });
+                            showToast('Access granted via GitHub Token.', 'success');
+                            loadGhSettingsUI();
+                            checkPageAccess();
+                            return;
+                        }
+                    } catch(e){}
+                }
+                
+                loginError.textContent = err.message || 'Access Denied. Invalid credentials.';
+            } finally {
+                loginSubmitBtn.disabled = false;
+                loginSubmitBtn.textContent = 'INITIALIZE ACCESS';
+            }
+        });
+    }
     
     // Configured list of simple string fields
     const simpleFields = [
@@ -1073,9 +1157,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isServerAvailable) {
                 // Server mode
+                const headers = { 'Content-Type': 'application/json' };
+                const authCreds = sessionStorage.getItem('admin_auth_creds');
+                if (authCreds) {
+                    headers['Authorization'] = 'Basic ' + authCreds;
+                }
                 const res = await fetch('/api/analyze-certificate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers,
                     body: JSON.stringify({ base64: base64Data, mimeType: file.type })
                 });
                 if (!res.ok) {
