@@ -424,42 +424,30 @@ body.custom-cursor-active {
 
 /* Cyber Targeting Cursor */
 .cyber-cursor {
-    width: 50px;
-    height: 50px;
-    border: 2px solid rgba(0, 255, 255, 0.4);
-    border-radius: 50%;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 14px solid var(--accent-color);
     position: fixed;
     pointer-events: none;
     z-index: 10000;
-    transition: transform 0.2s cubic-bezier(0.1, 0, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.05s ease, border-color 0.2s ease;
     mix-blend-mode: screen;
-    /* Crosshair inner lines */
-    background:
-        linear-gradient(to right, rgba(0, 255, 255, 0.5) 2px, transparent 2px) 50% 0 / 2px 8px no-repeat,
-        linear-gradient(to right, rgba(0, 255, 255, 0.5) 2px, transparent 2px) 50% 100% / 2px 8px no-repeat,
-        linear-gradient(to bottom, rgba(0, 255, 255, 0.5) 2px, transparent 2px) 0 50% / 8px 2px no-repeat,
-        linear-gradient(to bottom, rgba(0, 255, 255, 0.5) 2px, transparent 2px) 100% 50% / 8px 2px no-repeat;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
+    box-shadow: none;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+    transform: rotate(-35deg);
 }
 
 .cyber-cursor-dot {
-    width: 6px;
-    height: 6px;
-    background: #00ffff;
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 10001;
-    box-shadow: 0 0 10px #00ffff;
-    transition: transform 0.1s ease;
+    display: none; /* Hide the extra dot for a cleaner layout */
 }
 
 /* "Lock-on" state when hovering clickable elements */
 .cyber-cursor.lock-on {
-    transform: scale(0.6) rotate(45deg);
-    border-color: #00ffff;
-    background: rgba(0, 255, 255, 0.15);
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 20px rgba(0, 255, 255, 0.4);
+    border-bottom-color: var(--accent-color);
+    filter: drop-shadow(0 0 8px var(--accent-color));
+    transform: scale(1.15) rotate(-35deg);
 }
 
 .cyber-cursor-dot.lock-on {

@@ -514,13 +514,11 @@ const init = () => {
     if (!isTouchDevice) {
         document.addEventListener('mousemove', (e) => {
             // Move Cyber Cursor
-            if (cyberCursor && cyberCursorDot) {
-                cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0)`;
-                cyberCursorDot.style.transform = `translate3d(${e.clientX - 3}px, ${e.clientY - 3}px, 0)`;
-
-                // Lock-on logic is handled by css transform, so we just update pos here
+            if (cyberCursor) {
+                cyberCursor.style.transform = `translate3d(${e.clientX - 6}px, ${e.clientY}px, 0) rotate(-35deg)`;
+                
                 if (cyberCursor.classList.contains('lock-on')) {
-                    cyberCursor.style.transform = `translate3d(${e.clientX - 25}px, ${e.clientY - 25}px, 0) scale(0.6) rotate(45deg)`;
+                    cyberCursor.style.transform = `translate3d(${e.clientX - 6}px, ${e.clientY}px, 0) scale(1.15) rotate(-35deg)`;
                 }
             }
 
