@@ -1,1 +1,92 @@
-{"heroBadge":"Executive – IT","heroFirstName":"Sonal Shashika Darshana","heroLastName":"Jayawardana","heroTagline":"IT professional specializing in automation, infrastructure management, and technology innovation.","aboutP1":"I am a dynamic IT professional with a proven ability to work on my own initiative and as part of a high-performing team. With a strong positive attitude and excellent analytical problem-solving skills, I specialize in bridging the gap between complex infrastructure and user-centric solutions.","aboutP2":"Currently serving as an <strong>IT Executive at AAT Sri Lanka</strong>, I oversee critical technology operations, hardware engineering, and infrastructure management. My background is rooted in hands-on technical troubleshooting and system administration, complemented by a deep interest in graphic design and project management.","aboutP3":"My career objective is to continuously drive technology innovation while delivering robust, scalable hardware and software systems.","stat1Value":"11+","stat1Label":"Years Tech Experience","stat2Value":"100%","stat2Label":"System Reliability","stat3Value":"3+","stat3Label":"Certifications","experienceData":[{"date":"Mar 2023 - Present","title":"Information Technology Executive","company":"Association of Accounting Technicians of Sri Lanka (AAT)","description":"Managing and optimizing IT infrastructure, providing technical leadership, and ensuring the reliability of critical systems across the organization."},{"date":"May 2014 - Apr 2023","title":"Computer Hardware Technician","company":"Association of Accounting Technicians of Sri Lanka (AAT)","description":"Handled hardware diagnostics, repair, assembly, and network troubleshooting to maintain operational efficiency."}],"skillsData":[{"category":"Infrastructure & Virtualization","skills":["VMWare ESXi & Hyper-V","Active Directory & System Admin","Hardware Engineering & Repair","CCTV & PABX Systems"]},{"category":"Networking & Security","skills":["Cisco & Mikrotik Routing","Network Diagnostics","Enterprise Wi-Fi Management","Firewall Configuration"]}],"projectsData":[{"title":"Enterprise Network Monitor","tags":["Python","Grafana","SNMP"],"description":"Built a real-time monitoring dashboard for the entire AAT LAN infrastructure, drastically reducing downtime.","link":"#","category":"infrastructure"},{"title":"Automated Backup System","tags":["Bash","Cron","AWS S3"],"description":"Developed a robust, automated backup solution for critical databases ensuring 100% data integrity.","link":"#","category":"automation"}],"certsData":[{"title":"Vocational Training Authority (VTA) – IT Support","issuer":"VTA","date":"2018","file":"images/certificates/1779941752114_dara_page-0001.jpg","file2":"images/certificates/1779942292630_dara_page-0002.jpg"},{"title":"CompTIA A+ Equivalent","issuer":"A+ Academy","date":"2020","file":"","file2":""}],"themePreset":"purple","animationPreset":"terminal","profileAnimPreset":"matrix"}
+{
+  "heroBadge": "Executive – IT",
+  "heroFirstName": "Sonal Shashika Darshana",
+  "heroLastName": "Jayawardana",
+  "heroTagline": "IT professional specializing in automation, infrastructure management, and technology innovation.",
+  "aboutP1": "I am a dynamic IT professional with a proven ability to work on my own initiative and as part of a high-performing team. With a strong positive attitude and excellent analytical problem-solving skills, I specialize in bridging the gap between complex infrastructure and user-centric solutions.",
+  "aboutP2": "Currently serving as an <strong>IT Executive at AAT Sri Lanka</strong>, I oversee critical technology operations, hardware engineering, and infrastructure management. My background is rooted in hands-on technical troubleshooting and system administration, complemented by a deep interest in graphic design and project management.",
+  "aboutP3": "My career objective is to continuously drive technology innovation while delivering robust, scalable hardware and software systems.",
+  "stat1Value": "11+",
+  "stat1Label": "Years Tech Experience",
+  "stat2Value": "100%",
+  "stat2Label": "System Reliability",
+  "stat3Value": "3+",
+  "stat3Label": "Certifications",
+  "experienceData": [
+    {
+      "date": "Mar 2023 - Present",
+      "title": "Information Technology Executive",
+      "company": "Association of Accounting Technicians of Sri Lanka (AAT)",
+      "description": "Managing and optimizing IT infrastructure, providing technical leadership, and ensuring the reliability of critical systems across the organization."
+    },
+    {
+      "date": "May 2014 - Apr 2023",
+      "title": "Computer Hardware Technician",
+      "company": "Association of Accounting Technicians of Sri Lanka (AAT)",
+      "description": "Handled hardware diagnostics, repair, assembly, and network troubleshooting to maintain operational efficiency."
+    }
+  ],
+  "skillsData": [
+    {
+      "category": "Infrastructure & Virtualization",
+      "skills": [
+        "VMWare ESXi & Hyper-V",
+        "Active Directory & System Admin",
+        "Hardware Engineering & Repair",
+        "CCTV & PABX Systems"
+      ]
+    },
+    {
+      "category": "Networking & Security",
+      "skills": [
+        "Cisco & Mikrotik Routing",
+        "Network Diagnostics",
+        "Enterprise Wi-Fi Management",
+        "Firewall Configuration"
+      ]
+    }
+  ],
+  "projectsData": [
+    {
+      "title": "Enterprise Network Monitor",
+      "tags": [
+        "Python",
+        "Grafana",
+        "SNMP"
+      ],
+      "description": "Built a real-time monitoring dashboard for the entire AAT LAN infrastructure, drastically reducing downtime.",
+      "link": "#",
+      "category": "infrastructure"
+    },
+    {
+      "title": "Automated Backup System",
+      "tags": [
+        "Bash",
+        "Cron",
+        "AWS S3"
+      ],
+      "description": "Developed a robust, automated backup solution for critical databases ensuring 100% data integrity.",
+      "link": "#",
+      "category": "automation"
+    }
+  ],
+  "certsData": [
+    {
+      "title": "Vocational Training Authority (VTA) – IT Support",
+      "issuer": "VTA",
+      "date": "2018",
+      "file": "images/certificates/1779941752114_dara_page-0001.jpg",
+      "file2": "images/certificates/1779942292630_dara_page-0002.jpg"
+    },
+    {
+      "title": "CompTIA A+ Equivalent",
+      "issuer": "A+ Academy",
+      "date": "2020",
+      "file": "",
+      "file2": ""
+    }
+  ],
+  "themePreset": "purple",
+  "animationPreset": "terminal",
+  "profileAnimPreset": "matrix"
+}
