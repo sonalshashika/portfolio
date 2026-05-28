@@ -1606,6 +1606,26 @@ ul {
     gap: 2rem;
 }
 
+/* Enforce equal-sized cards in Portfolio Showcase */
+#projects-container {
+    grid-auto-rows: 1fr;
+    align-items: stretch;
+}
+
+#projects-container > .project-card {
+    height: 100%;
+}
+
+#projects-container > .project-card .project-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#projects-container > .project-card .project-content p {
+    flex: 1;
+}
+
 .bento-large {
     grid-column: span 12;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0.4));
