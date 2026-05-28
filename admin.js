@@ -48,8 +48,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast('Access granted.', 'success');
                     checkPageAccess();
                 } else {
-                    const data = await res.json();
-                    throw new Error(data.error || 'Invalid credentials');
+                    let errMsg = 'Invalid credentials';
+                    try {
+                        const data = await res.json();
+                        errMsg = data.error || errMsg;
+                    } catch (e) {
+                        try {
+                            const txt = await res.text();
+                            if (txt.includes('ADMIN_PASS')) {
+                                errMsg = 'ADMIN_PASS environment variable is not configured on Vercel.';
+                            } else {
+                                errMsg = `Server error (${res.status}): ${txt.substring(0, 50)}...`;
+                            }
+                        } catch (e2) {
+                            errMsg = `Server error (${res.status})`;
+                        }
+                    }
+                    throw new Error(errMsg);
                 }
             } catch (err) {
                 // Fallback for static GitHub Pages Mode (Validate via GitHub Token)
